@@ -15,10 +15,11 @@ You can also put it in the same directory where your script is and add it with `
 
 
 
+
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Right now only string values are supported.
 ```powershell
-  Add-RegistryValue [-Path] <String> [-Name] <String> [-Value] <String> -REG_SZ 
+Add-RegistryValue [-Path] <String> [-Name] <String> [-Value] <String> -REG_SZ 
 ```
  
 - *Path* - The registry path, e.g. HKCU:\Software\TEMP\TSVARS
@@ -29,7 +30,7 @@ Adds a value to the given registry path. Right now only string values are suppor
 ### ConvertTo-HumanizedBytesString ###
 Returns a string optimized for readability.
 ```powershell
-  ConvertTo-HumanizedBytesString [-bytes] <Int64> 
+ConvertTo-HumanizedBytesString [-bytes] <Int64> 
 ```
  
 - *bytes* - The value of bytes that should be returned as humanized string.
@@ -37,7 +38,7 @@ Returns a string optimized for readability.
 ### ConvertTo-Version ###
 Returns a VERSION object with the version number converted from the given text.
 ```powershell
-  ConvertTo-Version [[-Text] <String>] [-RespectLeadingZeros] 
+ConvertTo-Version [[-Text] <String>] [-RespectLeadingZeros] 
 ```
  
 - *Text* - The input string to be converted, e.g. 1.3.44.
@@ -46,7 +47,7 @@ Returns a VERSION object with the version number converted from the given text.
 ### Exit-Context ###
 Will exit from the current context and sets an exit code. Nothing will be done when running in ISE.
 ```powershell
-  Exit-Context [-ExitCode] <Int32> [-Force] 
+Exit-Context [-ExitCode] <Int32> [-Force] 
 ```
  
 - *ExitCode* - The number the exit code should be set to.
@@ -55,16 +56,16 @@ Will exit from the current context and sets an exit code. Nothing will be done w
 ### Get-ComputerLastBootupTime ###
 Returns the date and time of the last bootup time of this computer.
 ```powershell
-  Get-ComputerLastBootupTime 
+Get-ComputerLastBootupTime 
 ```
  
  
 ### Get-CurrentProcessBitness ###
 Returns information about the current powershell process.
 ```powershell
-  Get-CurrentProcessBitness -Is64bit 
-  Get-CurrentProcessBitness -Is32bit 
-  Get-CurrentProcessBitness -IsWoW 
+Get-CurrentProcessBitness -Is64bit 
+Get-CurrentProcessBitness -Is32bit 
+Get-CurrentProcessBitness -IsWoW 
 ```
  
 - *Is64bit* - Returns $True if the current script is running as 64-bit process.
@@ -74,7 +75,7 @@ Returns information about the current powershell process.
 ### Get-ModuleAvailable ###
 Returns true if the module exist; it uses a a method that is about 10 times faster then using Get-Module -ListAvailable
 ```powershell
-  Get-ModuleAvailable [-Name] <String> 
+Get-ModuleAvailable [-Name] <String> 
 ```
  
 - *Name* - The name of the module to be checked
@@ -82,8 +83,8 @@ Returns true if the module exist; it uses a a method that is about 10 times fast
 ### Get-OperatingSystemBitness ###
 Returns information about the current operating system
 ```powershell
-  Get-OperatingSystemBitness -Is64bit 
-  Get-OperatingSystemBitness -Is32bit 
+Get-OperatingSystemBitness -Is64bit 
+Get-OperatingSystemBitness -Is32bit 
 ```
  
 - *Is64bit* - Returns $True if the current operating system is 64-bit
@@ -92,7 +93,7 @@ Returns information about the current operating system
 ### Get-RandomString ###
 Returns a random string (only Aa-Zz are used).
 ```powershell
-  Get-RandomString [-Length] <Int32> 
+Get-RandomString [-Length] <Int32> 
 ```
  
 - *Length* - The length of the string that should be generated.
@@ -100,14 +101,14 @@ Returns a random string (only Aa-Zz are used).
 ### Get-RunningInISE ###
 Returns if the current script is executed by Windows PowerShell ISE
 ```powershell
-  Get-RunningInISE 
+Get-RunningInISE 
 ```
  
  
 ### Get-StringHasData ###
 Returns true if the string contains data (not $null, empty or only white spaces)
 ```powershell
-  Get-StringHasData [-string] <String> 
+Get-StringHasData [-string] <String> 
 ```
  
 - *string* - The string value to be checked
@@ -115,7 +116,7 @@ Returns true if the string contains data (not $null, empty or only white spaces)
 ### Get-StringIsNullOrWhiteSpace ###
 Returns true if the string is either $null, empty, or consists only of white-space characters.
 ```powershell
-  Get-StringIsNullOrWhiteSpace [-string] <String> 
+Get-StringIsNullOrWhiteSpace [-string] <String> 
 ```
  
 - *string* - The string value to be checked
@@ -123,14 +124,14 @@ Returns true if the string is either $null, empty, or consists only of white-spa
 ### Get-TempFolder ###
 Returns a path to the temporary folder without any (8+3) paths in it
 ```powershell
-  Get-TempFolder 
+Get-TempFolder 
 ```
  
  
 ### Read-StringHashtable ###
 Reads a hashtable from a file where the key-value pairs are stored as Key==Value
 ```powershell
-  Read-StringHashtable [-File] <String> 
+Read-StringHashtable [-File] <String> 
 ```
  
 - *File* - The file to read the hashtable from
@@ -138,7 +139,7 @@ Reads a hashtable from a file where the key-value pairs are stored as Key==Value
 ### Show-MessageBox ###
 Shows the message box to the user using a message box.
 ```powershell
-  Show-MessageBox [-Message] <String> [[-Titel] <String>] [-Critical] [-Huge] 
+Show-MessageBox [-Message] <String> [[-Titel] <String>] [-Critical] [-Huge] 
 ```
  
 - *Message* - The message to be displayed inside the message box.
@@ -149,7 +150,7 @@ Shows the message box to the user using a message box.
 ### Start-TranscriptIfSupported ###
 Starts a transscript, but ignores if the host does not support it.
 ```powershell
-  Start-TranscriptIfSupported [[-Path] <String>] [[-Name] <String>] [-NewLog] 
+Start-TranscriptIfSupported [[-Path] <String>] [[-Name] <String>] [-NewLog] 
 ```
  
 - *Path* - The path where to store the transcript. If empty, the %TEMP% folder is used.
@@ -159,7 +160,7 @@ Starts a transscript, but ignores if the host does not support it.
 ### Start-TranscriptTaskSequence ###
 If the scripts runs in MDT or SCCM, the transcript will be stored in the path LOGPATH defines. If not, C:\WINDOWS\TEMP is used.
 ```powershell
-  Start-TranscriptTaskSequence [-NewLog] 
+Start-TranscriptTaskSequence [-NewLog] 
 ```
  
 - *NewLog* - When set, will create a log file every time a transcript is started
@@ -167,8 +168,10 @@ If the scripts runs in MDT or SCCM, the transcript will be stored in the path LO
 ### Stop-TranscriptIfSupported ###
 Stops a transscript, but ignores if the host does not support it.
 ```powershell
-  Stop-TranscriptIfSupported 
+Stop-TranscriptIfSupported 
 ```
+
+
 
 
  

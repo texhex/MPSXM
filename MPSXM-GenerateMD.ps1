@@ -67,7 +67,7 @@ param(
    {
      #most of the function do not support common params, so we leave this out
      $syntaxToken=$syntaxToken.Replace("[<CommonParameters>]", "")
-     $output += "  $syntaxToken`n"
+     $output += "$syntaxToken`n"
    }
  }
 
