@@ -157,12 +157,13 @@ write-host "---------------------------"
 
 Exit-Context -ExitCode 1
 
+#bye bye
+#Exit-Context -ExitCode 2 -Force
+
 write-host "---------------------------"
 
-Get-Command -Module MPSXM
 
 
-#Exit-Context -ExitCode 2 -Force
 
 
 write-host " "
