@@ -1,5 +1,5 @@
 # Michael's PowerShell eXtension Module (MPSXM)
-A PowerShell module (v4+) with assorted functions. I added a function to this module as soon as I realized I will need it in more than one script. It release it and put it under to Apache 2 License with the hope it is useful for others.
+A PowerShell module (v4+) with assorted functions. I added a function to this module as soon as I realized I will need it in more than one script. I release it under the Apache 2 License with the hope that other might find it useful too. 
 
 ## How to use ##
 
