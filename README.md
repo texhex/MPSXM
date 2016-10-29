@@ -3,7 +3,7 @@ A PowerShell module (v4+) with assorted functions. I added a function to this mo
 
 ## How to use ##
 
-Just download it from [Releases](/releases/latest) and put it in your ```PSModulePath``` path (see [MSDN](https://msdn.microsoft.com/en-us/library/dd878350(v=vs.85).aspx)). 
+Just download it from [Releases](https://github.com/texhex/MPSXM/releases/latest) and put it in your ```PSModulePath``` path (see [MSDN](https://msdn.microsoft.com/en-us/library/dd878350(v=vs.85).aspx)). 
 
 You can also put it in the same directory where your script is and add it with ```Import-Module "$PSScriptRoot\MPSXM.psm1"```. 
 
@@ -178,7 +178,7 @@ Stops a transscript, but ignores if the host does not support it.
 <!---------------------------------- STOP HERE ---------------------------------->
 
 ## Contributions
-Any constructive contribution is very welcome! If you encounter a bug or have an addition, please create a [new issue](/issues/new).
+Any constructive contribution is very welcome! If you encounter a bug or have an addition, please create a [new issue](https://github.com/texhex/MPSXM/issues/new).
 
 ## License
 Copyright Â© 2016 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.
