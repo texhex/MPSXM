@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.14.2
+# Version 3.15.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -944,3 +944,215 @@ param(
    exit $ExitCode
  }
 } 
+
+
+function Get-QuickReference()
+{
+<#
+  .SYNOPSIS
+  Returns a quick reference about the given function or all functions in the module (if you are on GitHub, this text was generated with it).
+
+  .PARAMETER Name
+  Name of the function or the module to generate a quick reference
+
+  .PARAMETER Module
+  Name specifies a module, a quick reference for all functions in the module should be generated 
+
+  .PARAMETER Output
+  If the output should be a string (default), CommonMark or the real objects
+
+  .OUTPUTS
+  String
+#>
+param (
+  [Parameter(Mandatory=$True,Position=1)]
+  [string]$Name,
+
+  [Parameter(Mandatory=$False)]
+  [ValidateSet('String','CommonMark','Objects')]
+  [System.String]$Output="String",
+
+  [Parameter(Mandatory=$False)]
+  [switch]$Module
+)
+ $qrList=@()
+
+ if ( -not $Module )
+ {
+    $functions=Get-Command $Name
+ }
+ else
+ {
+    $functions=Get-Command -Module $Name
+ }
+
+
+ foreach ($function in $functions)
+ {
+   #generate result object 
+   $QuickRef=[PSObject]@{"Name"=""; "Synopsis"=""; "Syntax"=@(); "Parameter"=@(); }
+
+   #We need to respect the order of the parameters in the list, so we can't use a hashtable
+   #  $QuickRef.Parameter=@{}
+   #Or an OrderedDictionary
+   #  $QuickRef.Parameter=New-Object "System.Collections.Specialized.OrderedDictionary"
+   #A normal generic dictionary will do
+   $QuickRef.Parameter=New-Object "System.Collections.Generic.Dictionary[string,string]"
+
+      
+   $functionName = $function.Name   
+   
+   $help=get-help $functionName
+
+   $QuickRef.Name=$function.Name.Trim()
+   $QuickRef.Synopsis=[string]$help.Synopsis.Trim() #aka "Description"
+ 
+   ##################################
+   # Syntax
+   $syntax=$help.Syntax | Out-String   
+   $syntax=$syntax.Trim()
+   
+   #check if we have more than one entry in syntax
+   $syntaxTokens=$syntax.Split("`n")
+   foreach ($syntaxToken in $syntaxTokens)
+   {
+      #most of the function do not support common params, so we leave this out
+      $syntaxToken=$syntaxToken.Replace("[<CommonParameters>]", "")
+      $syntaxToken=$syntaxToken.Trim()
+
+      if ( $syntaxToken -ne "" ) 
+      {
+         $QuickRef.Syntax += $syntaxToken
+      }
+   }
+   
+   ##############################################
+   # Parameters
+
+   #parameters might be null
+   if ( $help.parameters -ne $null  )
+   {
+     #Temp object which will used to either store a single paramter or a pointer to the real parameter collection
+     $params=@()
+
+     #parameters can be a string ?!??!?!?!
+     if ( $help.parameters -isnot [String] ) 
+     {
+        #the parameter can also be null
+        if ( $help.parameters.parameter -ne $null )
+        {
+           #When we are here, we might have one or more parameters
+           #I have no idea how to better check this, as (( -is [array] )) is not working          
+           try
+           {
+             #this will fail if there is only one parameter
+             $ignored=$help.parameters.parameter.Count             
+             $params=$help.parameters.parameter
+           }
+           catch
+           {
+             #Add the single parameter to our existing array
+             $params += $help.parameters.parameter
+           }
+        }
+     }
+
+     #check every parameter (if any)
+     foreach ($param in $params)              
+     {
+      $paramName=$Param.Name
+     
+      #we might suck at documentation and forgot the description
+      try 
+      {
+        $paramDesc=[string]$Param.Description.Text.Trim()
+      }
+      catch
+      {
+        $desc="*!*!* PARAMETER DESCRIPTION MISSING *!*!*"
+      }     
+      
+      $QuickRef.Parameter.Add($paramName,$paramDesc) 
+     }
+
+   
+   } #params is null
+
+   #Now we should have everything in our QuickRef object
+   $qrList += $QuickRef
+
+  } #foreach
+  
+  #$qrList contains one or more objects we can use - check which output the caller wants
+  switch ($Output)
+  {
+     "Objects"
+     {
+       return $qrList    
+     }
+
+     "CommonMark"
+     {
+        $txt=""
+
+        #github requires three back-ticks but this is an escape char for PS 
+        $CODE_BLOCK_END="``````" 
+        $CODE_BLOCK_START="$($CODE_BLOCK_END)powershell" 
+
+        foreach ($qr in $qrList)
+        {  
+          $txt +="### $($qr.Name) ###`n"
+          $txt +="$($qr.Synopsis)`n"
+   
+          #Syntax
+          $txt += "$CODE_BLOCK_START`n"
+          foreach ($syn in $qr.Syntax)
+          {
+            $txt += "$($syn)`n"
+          }          
+          $txt += "$CODE_BLOCK_END`n"
+
+          #Parameters (if any)
+          foreach ($param in $qr.Parameter.GetEnumerator())
+          {
+             #Syntax is: <List> <BOLD>NAME<BOLD> - Description
+             $txt += " - *$($param.Key)* - $($param.Value)`n"
+          }
+          
+          $txt += "`n"
+       }
+
+       return $txt
+     }
+
+     "String"
+     {
+        $txt=""
+
+        foreach ($qr in $qrList)
+        {  
+          $txt +="( $($qr.Name) ) - $($qr.Synopsis)`n"
+   
+          $txt += "`n"
+          foreach ($syn in $qr.Syntax)
+          {
+            $txt += "  $($syn)`n"
+          }          
+          $txt += "`n"
+
+          #Parameters (if any)
+          foreach ($param in $qr.Parameter.GetEnumerator())
+          {
+             #Syntax is: <List> <BOLD>NAME<BOLD> - Description
+             $txt += "  $($param.Key): $($param.Value)`n"
+          }
+          
+          $txt += "`n"
+       }
+
+       return $txt
+     }
+  }
+
+
+}
