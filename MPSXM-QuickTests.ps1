@@ -61,6 +61,9 @@ param(
 
 write-host "Start"
 
+Start-TranscriptIfSupported
+
+
 $result=Get-CurrentProcessBitness -Is64bit
 write-host "Cur Proc: 64bit $result"
 
@@ -133,9 +136,9 @@ Show-MessageBox -Message "INFO with Title" -Titel "My Title"
 
 write-host "Show message box HUGE Test..."
 
-Show-MessageBox -Message "INFO" -Huge
-Show-MessageBox -Message "ERROR" -Critical -Huge
-Show-MessageBox -Message "INFO with Title" -Titel "My Title" -Huge
+Show-MessageBox -Message "INFO HUGE" -Huge
+Show-MessageBox -Message "ERROR HUGE " -Critical -Huge
+Show-MessageBox -Message "INFO with Title HUGE" -Titel "My Title" -Huge
 
 write-host "---------------------------"
 
@@ -155,17 +158,44 @@ write-host "Humanized Bytes [$input] : $(ConvertTo-HumanizedBytesString $input)"
 
 write-host "---------------------------"
 
-Exit-Context -ExitCode 1
+$dict=New-Dictionary -StringPairs
+write-host "***Dictionary -StringPairs ***: $($dict.PSTypenames[0])"
+write-host ""
 
-#bye bye
-#Exit-Context -ExitCode 2 -Force
+$dict=New-Dictionary -KeyAsString
+write-host "***Dictionary -KeyAsString ***: $($dict.PSTypenames[0])"
+write-host ""
+
+$dict=New-Dictionary -KeyType "PSObject" -ValueType "string"
+write-host "***Dictionary -TypeKey PSObject -TypeValue string ***: $($dict.PSTypenames[0])"
+write-host ""
+
+#create a hashtable
+$hashtable=@{"AbCdeF"="AbCdeF-Value"; "ZZZ"="ZZZ-Value"}
+write-host "Value from hashtable using only lower case letters: $($hashtable["abcdef"])"
+
+#create a dictionary
+$dict=New-Dictionary -StringPairs 
+$dict.Add("AbCdeF","AbCdeF-value")
+$dict.Add("ZZZ","ZZZ-Value")
+#A standard dictionary would not return anything because it's case-sensitive
+write-host "Value from dictionary using only lower case letters: $($dict["abcdef"])" 
 
 write-host "---------------------------"
 
 
+Exit-Context -ExitCode 1
 
+#Try it: This will end your session
+#Exit-Context -ExitCode 2 -Force
+
+write-host "---------------------------"
+
+Stop-TranscriptIfSupported
 
 
 write-host " "
 write-host " "
 write-host "ENDE"
+
+

@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.15.0
+# Version 3.16.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -417,13 +417,9 @@ function Start-TranscriptTaskSequence()
   [Parameter(Mandatory=$False)]
   [switch]$NewLog=$False
  )
- if ( ! (Get-StringHasData $Name) )
+ if ( Get-StringIsNullOrWhiteSpace $Name )
  {
-   $baseName=$Name
- }
- else
- {
-  $scriptFilename=Split-Path -Path $myInvocation.ScriptName -Leaf   
+  $Name=Split-Path -Path $myInvocation.ScriptName -Leaf   
  }
  
  $logFileTemplate = "$($Name).log"
@@ -498,13 +494,11 @@ function Start-TranscriptTaskSequence()
  try 
  {
    write-verbose "Trying to execute Start-Transcript for $logFile"
-
    Start-Transcript -Path $logfile
-   Write-verbose "Start-TranscriptIfSupported: Logging to $logFile"
  }
  catch [System.Management.Automation.PSNotSupportedException] {
     # The current PowerShell Host doesn't support transcribing
-    write-host "Start-TranscriptIfSupported WARNING: The current PowerShell host doesn't support transcribing. No log will be generated."
+    write-host "Start-TranscriptIfSupported: The current PowerShell host doesn't support transcribing; no log will be generated to [$logfile]"
  }}function Stop-TranscriptIfSupported {
 <#
   .SYNOPSIS
@@ -631,7 +625,7 @@ param(
 function Get-RandomString { 
 <#
   .SYNOPSIS
-  Returns a random string (only Aa-Zz are used).
+  Returns a random string (only Aa-Zz and 0-9 are used).
 
   .PARAMETER Length
   The length of the string that should be generated.
@@ -997,8 +991,8 @@ param (
    #Or an OrderedDictionary
    #  $QuickRef.Parameter=New-Object "System.Collections.Specialized.OrderedDictionary"
    #A normal generic dictionary will do
-   $QuickRef.Parameter=New-Object "System.Collections.Generic.Dictionary[string,string]"
-
+   #  $QuickRef.Parameter=New-Object "System.Collections.Generic.Dictionary[string,string]"
+   $QuickRef.Parameter=New-Dictionary -StringPairs
       
    $functionName = $function.Name   
    
@@ -1156,3 +1150,172 @@ param (
 
 
 }
+
+function New-Dictionary()
+{
+<#
+  .SYNOPSIS
+  Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by key as in a hashtable
+
+  .PARAMETER StringPairs
+  Both the key and the value of the dictionary are strings. Accessing values using object[Key] is case-insensitve.
+
+  .PARAMETER KeyAsString
+  The key of the dictionary is of type string, the value is a PSObject. Accessing values using object[Key] is case-insensitve.
+
+  .PARAMETER KeyType
+  Defines the type used for the key. Accessing values using object[Key] is NOT case-insensitve, it's case-sensitive.
+
+  .PARAMETER ValueType
+  Defines the type used for the value. 
+
+  .OUTPUTS
+  System.Collections.Generic.Dictionary
+#>
+#No idea what I should write here. The line below makes PS say it does not know this type
+#[OutputType([System.Collections.Generic.Dictionary])]  
+
+param (
+  [Parameter(ParameterSetName="KeyAndValueString", Mandatory=$false)]
+  [switch]$StringPairs,
+
+  [Parameter(ParameterSetName="KeyStringValuePSObject", Mandatory=$false)]
+  [switch]$KeyAsString,
+
+  [Parameter(ParameterSetName="DefineType", Mandatory=$true)]
+  [string]$KeyType,
+
+  [Parameter(ParameterSetName="DefineType", Mandatory=$true)]
+  [string]$ValueType
+)
+ 
+ #The important thing here that we need to create a dictionary that is case-insensitive
+ #(StringComparer.InvariantCultureIgnoreCase) is slower than (StringComparer.OrdinalIgnoreCase) because it also replaces things (Straße becomes Strasse)
+ #I have no idea how CurrentCultureIgnoreCase behaves
+
+ $result=$null
+
+ switch ($PsCmdlet.ParameterSetName)
+ {    
+    "KeyAndValueString"
+    {  
+      $result=New-Object -TypeName "System.Collections.Generic.Dictionary[string,string]" -ArgumentList @([System.StringComparer]::OrdinalIgnoreCase)
+    }
+
+    "KeyStringValuePSObject"
+    {
+     $result=New-Object "System.Collections.Generic.Dictionary[string,PSObject]" -ArgumentList @([System.StringComparer]::OrdinalIgnoreCase)
+    }
+
+
+    "DefineType"
+    {
+     $result=New-Object "System.Collections.Generic.Dictionary[$KeyType,$ValueType]"     
+    }
+
+ }
+
+ 
+ return $result
+}
+
+
+function New-Exception()
+{
+<#
+  .SYNOPSIS
+  Generates an exception ready to be thrown, the expected usage is [throw New-Exception -(TypeOfException) "Explanation why exception is thrown"]
+
+  .PARAMETER Explanation
+  A description why the exception is thrown. If empty, a standard text matching the type of exception beeing generated is used
+
+  .PARAMETER NoCallerName
+  By default, the name of the function or script generating the exception is included in the explanation
+
+  .PARAMETER InvalidArgument
+  The exception it thrown because of a value does not fall within the expected range
+
+  .PARAMETER InvalidOperation
+  The exception is thrown because the operation is not valid due to the current state of the object
+
+  .PARAMETER InvalidFormat
+  The exception is thrown because One of the identified items was in an invalid format
+
+  .OUTPUTS
+  System.Exception
+#>
+[OutputType([System.Exception])]  
+param (
+  [Parameter(ParameterSetName="InvalidArgumentException", Mandatory=$true)]
+  [switch]$InvalidArgument,
+
+  [Parameter(ParameterSetName="InvalidOperationException", Mandatory=$true)]
+  [switch]$InvalidOperation,
+
+  [Parameter(ParameterSetName="FormatException", Mandatory=$true)]
+  [switch]$InvalidFormat,
+  
+  [Parameter(Mandatory=$false, Position=1)]
+  [string]$Explanation,
+
+  [Parameter(Mandatory=$false)]
+  [switch]$NoCallerName=$false
+)
+
+ $exception=$null
+ $caller=""
+
+ if ( -not $NoCallerName )
+ {
+    #No text was given. See if we can get the name of the caller
+    try 
+    { 
+      $caller=(Get-PSCallStack)[1].Command  
+    }
+    catch
+    { 
+      $caller="Unknown caller"    
+    }
+
+    $caller="$($caller): "
+ }
+
+
+ switch ($PsCmdlet.ParameterSetName)
+ {  
+    "InvalidArgumentException"
+    {
+      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      { 
+         $Explanation="Value does not fall within the expected range." 
+      }
+
+
+      $exception=New-Object System.ArgumentException "$caller$Explanation"
+    }    
+
+    "InvalidOperationException"
+    {
+      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      { 
+         $Explanation="Operation is not valid due to the current state of the object."
+      }
+
+      $exception=New-Object System.InvalidOperationException "$caller$Explanation"
+    }    
+
+    "FormatException"
+    {
+      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      { 
+         $Explanation="One of the identified items was in an invalid format."
+      }
+      
+      $exception=New-Object System.FormatException "$caller$Explanation"
+    }
+
+  }
+  
+  return $exception
+}
+

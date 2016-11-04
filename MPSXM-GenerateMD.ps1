@@ -19,8 +19,6 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 
 
-
-
 cls
 
 #Document all in MPSXM by using a function from MPSXM :)
