@@ -15,7 +15,6 @@ You can also put it in the same directory where your script is and add it with `
 
 
 
-
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Right now only string values are supported.
 ```powershell
@@ -92,7 +91,7 @@ Get-QuickReference [-Name] <String> [-Output <String>] [-Module]
  - *Module* - Name specifies a module, a quick reference for all functions in the module should be generated
 
 ### Get-RandomString ###
-Returns a random string (only Aa-Zz are used).
+Returns a random string (only Aa-Zz and 0-9 are used).
 ```powershell
 Get-RandomString [-Length] <Int32>
 ```
@@ -123,6 +122,31 @@ Returns a path to the temporary folder without any (8+3) paths in it
 ```powershell
 Get-TempFolder
 ```
+
+### New-Dictionary ###
+Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by key as in a hashtable
+```powershell
+New-Dictionary [-StringPairs]
+New-Dictionary [-StringKey]
+New-Dictionary -KeyType <String> -ValueType <String>
+```
+ - *StringPairs* - Both the key and the value of the dictionary are strings. Accessing values using object[Key] is case-insensitve.
+ - *StringKey* - The key of the dictionary is of type string, the value is of type PSObject. Accessing values using object[Key] is case-insensitve.
+ - *KeyType* - Defines the type used for the key. Accessing values using object[Key] is NOT case-insensitve, it's case-sensitive.
+ - *ValueType* - Defines the type used for the value.
+
+### New-Exception ###
+Generates an exception ready to be thrown, the expected usage is [throw New-Exception -(TypeOfException) "Explanation why exception is thrown"]
+```powershell
+New-Exception -InvalidArgument [[-Explanation] <String>] [-NoCallerName]
+New-Exception -InvalidOperation [[-Explanation] <String>] [-NoCallerName]
+New-Exception -InvalidFormat [[-Explanation] <String>] [-NoCallerName]
+```
+ - *InvalidArgument* - The exception it thrown because of a value does not fall within the expected range
+ - *InvalidOperation* - The exception is thrown because the operation is not valid due to the current state of the object
+ - *InvalidFormat* - The exception is thrown because One of the identified items was in an invalid format
+ - *Explanation* - A description why the exception is thrown. If empty, a standard text matching the type of exception beeing generated is used
+ - *NoCallerName* - By default, the name of the function or script generating the exception is included in the explanation
 
 ### Read-StringHashtable ###
 Reads a hashtable from a file where the key-value pairs are stored as Key==Value
@@ -162,6 +186,7 @@ Stops a transscript, but ignores if the host does not support it.
 ```powershell
 Stop-TranscriptIfSupported
 ```
+
 
 
 

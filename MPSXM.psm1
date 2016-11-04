@@ -1160,8 +1160,8 @@ function New-Dictionary()
   .PARAMETER StringPairs
   Both the key and the value of the dictionary are strings. Accessing values using object[Key] is case-insensitve.
 
-  .PARAMETER KeyAsString
-  The key of the dictionary is of type string, the value is a PSObject. Accessing values using object[Key] is case-insensitve.
+  .PARAMETER StringKey
+  The key of the dictionary is of type string, the value is of type PSObject. Accessing values using object[Key] is case-insensitve.
 
   .PARAMETER KeyType
   Defines the type used for the key. Accessing values using object[Key] is NOT case-insensitve, it's case-sensitive.
@@ -1180,7 +1180,7 @@ param (
   [switch]$StringPairs,
 
   [Parameter(ParameterSetName="KeyStringValuePSObject", Mandatory=$false)]
-  [switch]$KeyAsString,
+  [switch]$StringKey,
 
   [Parameter(ParameterSetName="DefineType", Mandatory=$true)]
   [string]$KeyType,
