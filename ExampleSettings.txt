@@ -1,0 +1,15 @@
+# Example file for Read-StringHashtable()
+
+MyName==MyValue
+
+
+#this is also valid, leading or tralling spaces are removed
+
+  MySecondKey ==  My second value
+  
+  
+# This will cause an error when uncommented (only single =) 
+#  WrongFormat=AllWrong
+
+# This will also cause an error when uncommented because a key with this name already exists
+#  MySecondKey ==  Woops!

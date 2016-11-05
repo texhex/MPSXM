@@ -1,6 +1,8 @@
-﻿#Quick test for MPSXM 
-#1.11
-#Michael Hex
+﻿# Quick test for MPSXM 
+# Version 1.13
+# by Michael Hex
+# https://github.com/texhex/MPSXM
+
 
 #This script requires PowerShell 4.0 or higher 
 #requires -version 4.0
@@ -14,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 #Import 
 Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
-function Test-Function_GetStringIsNullOrWhitespace()
+function Test-Function_TestStringIsNullOrWhitespace()
 {
 param(
  [Parameter(Mandatory=$True,Position=1)]
@@ -25,18 +27,18 @@ param(
  [bool]$ExpectedResult
 )
 
- $result=Get-StringIsNullOrWhiteSpace $string
+ $result=Test-String -IsNullOrWhiteSpace $string
  if ( $result -eq $expectedresult ) 
  {
-    write-host "Get-StringIsNullOrWhiteSpace [$string] : $result"
+    write-host "Test-String -IsNullOrWhiteSpace [$string] : $result"
  }
  else
  {
-   write-host "Get-StringIsNullOrWhiteSpace $string : FAILED! Expected [$ExpectedResult] but got $result"
+   write-host "Test-String -IsNullOrWhiteSpace $string : FAILED! Expected [$ExpectedResult] but got $result"
  }
 }
 
-function Test-Function_GetStringHasData()
+function Test-Function_TestStringHasData()
 {
 param(
  [Parameter(Mandatory=$True,Position=1)]
@@ -47,21 +49,74 @@ param(
  [bool]$ExpectedResult
 )
 
- $result=Get-StringHasData $string
+ $result=Test-String -HasData $string
  if ( $result -eq $expectedresult ) 
  {
-    write-host "Get-StringHasData [$string] : $result"
+    write-host "Test-String -HasData [$string] : $result"
  }
  else
  {
-   write-host "Get-StringHasData $string : FAILED! Expected [$ExpectedResult] but got $result"
+   write-error "Test-String -HasData $string : FAILED! Expected [$ExpectedResult] but got $result"
+ }
+}
+
+function Test-Function_TestStringContains()
+{
+param(
+ [Parameter(Mandatory=$True,Position=1)]
+ [AllowEmptyString()] 
+ [string]$string1,
+
+ [Parameter(Mandatory=$True,Position=2)]
+ [AllowEmptyString()] 
+ [string]$string2,
+
+ [Parameter(Mandatory=$True,Position=3)]
+ [bool]$ExpectedResult
+)
+
+ $result=Test-String $string1 -Contains $string2
+ 
+ if ( $result -eq $expectedresult ) 
+ {
+    write-host "Test-String [$string1] -Contains [$string2] : $result"
+ }
+ else
+ {
+   write-error "Test-String [$string1] -Contains [$string2] : FAILED! Expected [$ExpectedResult] but got $result"
+ }
+}
+
+function Test-Function_TestStringStartsWith()
+{
+param(
+ [Parameter(Mandatory=$True,Position=1)]
+ [AllowEmptyString()] 
+ [string]$string1,
+
+ [Parameter(Mandatory=$True,Position=2)]
+ [AllowEmptyString()] 
+ [string]$string2,
+
+ [Parameter(Mandatory=$True,Position=3)]
+ [bool]$ExpectedResult
+)
+
+ $result=Test-String $string1 -StartsWith $string2
+ 
+ if ( $result -eq $expectedresult ) 
+ {
+    write-host "Test-String [$string1] -StartsWith [$string2] : $result"
+ }
+ else
+ {
+   write-error "Test-String [$string1] -StartsWith [$string2] : FAILED! Expected [$ExpectedResult] but got $result"
  }
 }
 
 
+Clear-Host
 write-host "Start"
-
-Start-TranscriptIfSupported
 
 
 $result=Get-CurrentProcessBitness -Is64bit
@@ -83,21 +138,75 @@ write-host "Cur OS: 32bit $result"
 
 write-host "---------------------------"
 
-Test-Function_GetStringIsNullOrWhitespace "a" $False
-Test-Function_GetStringIsNullOrWhitespace  "" $true
-Test-Function_GetStringIsNullOrWhitespace " " $true
-Test-Function_GetStringIsNullOrWhitespace "     " $true
-Test-Function_GetStringIsNullOrWhitespace $null $true
+#General usage:
+$test=Test-String -IsNullOrWhiteSpace " " #returns true
+$test=Test-String -IsNullOrWhiteSpace "abc" #returns false
+
+#Using a special test function
+Test-Function_TestStringIsNullOrWhitespace "a" $False
+Test-Function_TestStringIsNullOrWhitespace $null $true
+Test-Function_TestStringIsNullOrWhitespace  "" $true
+Test-Function_TestStringIsNullOrWhitespace " " $true
+Test-Function_TestStringIsNullOrWhitespace "     " $true
+Test-Function_TestStringIsNullOrWhitespace "   z " $false
+
+
 
 write-host "---------------------------"
 
-Test-Function_GetStringHasData "a" $true
-Test-Function_GetStringHasData  "" $false
-Test-Function_GetStringHasData " " $false
-Test-Function_GetStringHasData "     " $false
-Test-Function_GetStringHasData $null $false
+#General usage:
+$test=Test-String -HasData " " #returns false
+$test=Test-String -HasData "abc" #returns true
+
+Test-Function_TestStringHasData "a" $true
+Test-Function_TestStringHasData $null $false
+Test-Function_TestStringHasData  "" $false
+Test-Function_TestStringHasData " " $false
+Test-Function_TestStringHasData "     " $false
+Test-Function_TestStringHasData "   Z  " $true
 
 write-host "---------------------------"
+
+#General usage:
+$test=Test-String "ABCDEFGH" -Contains "d" #returns true
+$test=Test-String "ABCDEFGH" -Contains "D" #returns true
+$test=Test-String "ABCDEFGH" -Contains "d" -CaseSensitive #return false
+
+Test-Function_TestStringContains "ABCDEFGH" "a" $true
+Test-Function_TestStringContains "ABCDEFGH" "abc" $true
+Test-Function_TestStringContains "ABCDEFGH" "abCDE" $true
+Test-Function_TestStringContains "abcdefgh" "ABC" $true
+Test-Function_TestStringContains "abcdefgh" "z" $false
+Test-Function_TestStringContains "abcdefgh" "Z" $false
+
+write-host "---------------------------"
+
+$test=Test-String "ABCDEFGH" -StartsWith "abc" #returns true
+$test=Test-String "ABCDEFGH" -StartsWith "Abc" #returns true
+$test=Test-String "ABCDEFGH" -StartsWith "abc" -CaseSensitive #return false
+
+Test-Function_TestStringStartsWith "ABCDEFGH" "abc" $true 
+Test-Function_TestStringStartsWith "ABCDEFGH" "abCDE" $true
+Test-Function_TestStringStartsWith "abcdefgh" "ABC" $true
+Test-Function_TestStringStartsWith "abcdefgh" "def" $false
+ 
+write-host "---------------------------"
+
+write-host "Read String hashtable:"
+
+$hashtable=Read-StringHashtable -File "$PSScriptRoot\ExampleSettings.txt"
+
+foreach ($entry in $hashtable.Keys)
+{
+  $name=$entry
+  $value = $hashtable[$entry]
+
+  write-host "[$name] = [$value]"
+}
+
+
+write-host "---------------------------"
+
 
 $result=Get-ModuleAvailable "Bitlocker"
 write-host "Get Module Availble - BitLocker:  $result"
@@ -120,25 +229,43 @@ write-host "Running in ISE: $result"
 
 write-host "---------------------------"
 
+#defaults to C:\Windows\Temp
 Start-TranscriptTaskSequence -NewLog
-write-host "Blah Blah"
-
+write-host "Test text "
 Stop-TranscriptIfSupported
+
+write-host "---------------------------"
+
+#defaults to %TEMP%
+Start-TranscriptIfSupported
+write-host "This text is added to the log"
+Stop-TranscriptIfSupported
+
+write-host "---------------------------"
+
+write-host "ConvertTo-Version [1.20]: $(ConvertTo-Version "1.20")"
+write-host "ConvertTo-Version [1.06]: $(ConvertTo-Version "1.06")"
+write-host "ConvertTo-Version [3.06.2]: $(ConvertTo-Version "3.06.2")"
+
+write-host "ConvertTo-Version [1.06] -RespectLeadingZeros: $(ConvertTo-Version "1.06" -RespectLeadingZeros)"
+write-host "ConvertTo-Version [3.08.1] -RespectLeadingZeros: $(ConvertTo-Version "3.08.1" -RespectLeadingZeros)"
+
+
 write-host "---------------------------"
 
 
 write-host "Show message box Test..."
 
-Show-MessageBox -Message "INFO"
-Show-MessageBox -Message "ERROR" -Critical
-Show-MessageBox -Message "INFO with Title" -Titel "My Title"
+#Show-MessageBox -Message "INFO"
+#Show-MessageBox -Message "ERROR" -Critical
+#Show-MessageBox -Message "INFO with Title" -Titel "My Title"
 
 
 write-host "Show message box HUGE Test..."
 
-Show-MessageBox -Message "INFO HUGE" -Huge
-Show-MessageBox -Message "ERROR HUGE " -Critical -Huge
-Show-MessageBox -Message "INFO with Title HUGE" -Titel "My Title" -Huge
+#Show-MessageBox -Message "INFO HUGE" -Huge
+#Show-MessageBox -Message "ERROR HUGE " -Critical -Huge
+#Show-MessageBox -Message "INFO with Title HUGE" -Titel "My Title" -Huge
 
 write-host "---------------------------"
 
@@ -162,8 +289,8 @@ $dict=New-Dictionary -StringPairs
 write-host "***Dictionary -StringPairs ***: $($dict.PSTypenames[0])"
 write-host ""
 
-$dict=New-Dictionary -KeyAsString
-write-host "***Dictionary -KeyAsString ***: $($dict.PSTypenames[0])"
+$dict=New-Dictionary -StringKey
+write-host "***Dictionary -StringKey ***: $($dict.PSTypenames[0])"
 write-host ""
 
 $dict=New-Dictionary -KeyType "PSObject" -ValueType "string"
@@ -190,8 +317,6 @@ Exit-Context -ExitCode 1
 #Exit-Context -ExitCode 2 -Force
 
 write-host "---------------------------"
-
-Stop-TranscriptIfSupported
 
 
 write-host " "

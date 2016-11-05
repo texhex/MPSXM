@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.16.0
+# Version 3.17.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -10,7 +10,6 @@
 #
 # In case you edit this file, new functions will not be found by the current PS session. Use -Force in this case.
 # Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
-#
 #
 #
 # Common header for your script:
@@ -175,20 +174,11 @@ param (
   } #switch
    
 }
-#Helper function for [string]::IsNullOrWhiteSpace - http://msdn.microsoft.com/en-us/library/system.string.isnullorwhitespace%28v=vs.110%29.aspx
-<#
- write-host "Tests for Get-StringIsNullOrWhiteSpace"
- Get-StringIsNullOrWhiteSpace "a" #False
- Get-StringIsNullOrWhiteSpace "" #true
- Get-StringIsNullOrWhiteSpace " " #true
- Get-StringIsNullOrWhiteSpace "     " #true
- Get-StringIsNullOrWhiteSpace $null #true
-#> 
 function Get-StringIsNullOrWhiteSpace()
 {
 <#
   .SYNOPSIS
-  Returns true if the string is either $null, empty, or consists only of white-space characters.
+  Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
 
   .PARAMETER String
   The string value to be checked
@@ -203,13 +193,7 @@ param (
  [string]$string
 )
 
-  if ([string]::IsNullOrWhiteSpace($string)) 
-  {
-     return $true
-  } else {
-     return $false
-  }
- 
+ return Test-String -IsNullOrWhiteSpace $string
 }
 
 
@@ -217,7 +201,7 @@ function Get-StringHasData()
 {
 <#
   .SYNOPSIS
-  Returns true if the string contains data (not $null, empty or only white spaces)
+  Returns true if the string contains data (does not contain $null, empty or only white spaces). Uses [Test-String -HasData] internally.
 
   .PARAMETER string
   The string value to be checked
@@ -232,19 +216,148 @@ param (
  [string]$string
 )
 
- if (-Not (Get-StringIsNullOrWhiteSpace $string)) 
- {
-    return $true
- } 
- else 
- {
-    return $false
- } 
-
+ return Test-String -HasData $string
 }
 
 
-#Yes, I know about $env:TEMP but this will always return a 8+3 path, e.g. C:\USERS\ADMIN~1\AppData..."
+<#
+ -IsNullOrWhiteSpace:
+   Helper function for [string]::IsNullOrWhiteSpace - http://msdn.microsoft.com/en-us/library/system.string.isnullorwhitespace%28v=vs.110%29.aspx
+ 
+
+   Test-String "a" -IsNullorWhitespace #false
+   Test-String $null -IsNullorWhitespace #$true
+   Test-String "" -IsNullorWhitespace #$true
+   Test-String " " -IsNullorWhitespace #$true
+   Test-String "     " -IsNullorWhitespace #$true
+
+ -HasData
+   String is not IsNullOrWhiteSpace
+
+ -Contains
+   Standard Contains() or IndexOf
+
+ -StartsWith
+   Uses string.StartsWith() with different parameters
+#> 
+function Test-String()
+{
+<#
+  .SYNOPSIS
+  Tests the given string for a condition 
+
+  .PARAMETER String
+  The string the specified operation should be performed on
+
+  .PARAMETER IsNullOrWhiteSpace
+  Returns true if the string is either $null, empty, or consists only of white-space characters.
+
+  .PARAMETER HasData
+  Returns true if the string contains data (not $null, empty or only white spaces)
+
+  .PARAMETER Contains
+  Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
+
+  .PARAMETER StartsWith
+  Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
+  
+  .PARAMETER SearchFor
+  The string beeing sought
+
+  .PARAMETER CaseSensitive
+  Perform an operation that respect letter casing, so [ABC] is different from [aBC]. 
+
+  .OUTPUTS
+  bool
+#>
+[OutputType([bool])]  
+param (
+  [Parameter(Mandatory=$false,Position=1)] #false or we can not pass empty strings
+  [string]$String=$null,
+
+  [Parameter(ParameterSetName="HasData", Mandatory=$true)]
+  [switch]$HasData,
+
+  [Parameter(ParameterSetName="IsNullOrWhiteSpace", Mandatory=$true)]
+  [switch]$IsNullOrWhiteSpace,
+  
+  [Parameter(ParameterSetName="Contains", Mandatory=$true)]
+  [switch]$Contains,
+
+  [Parameter(ParameterSetName="StartsWith", Mandatory=$true)]
+  [switch]$StartsWith,
+
+  [Parameter(ParameterSetName="Contains", Position=2, Mandatory=$false)] #$False or we can not pass an empty string in
+  [Parameter(ParameterSetName="StartsWith", Position=2, Mandatory=$false)] 
+  [string]$SearchFor,
+
+  [Parameter(ParameterSetName="Contains", Mandatory=$false)] 
+  [Parameter(ParameterSetName="StartsWith",Mandatory=$false)] #$False or we can not pass an empty string in
+  [Switch]$CaseSensitive=$false
+)
+
+ $result=$null
+
+ switch ($PsCmdlet.ParameterSetName)
+ {  
+    "IsNullOrWhiteSpace"
+    {
+       if ([string]::IsNullOrWhiteSpace($String)) 
+       {
+          $result=$true
+       }
+       else
+       {
+          $result=$false
+       }  
+    }    
+
+    "HasData"
+    {
+      $result= -not (Test-String -IsNullOrWhiteSpace $String)
+    }    
+
+    "Contains"
+    {
+      if ( $CaseSensitive ) 
+      {
+         $result=$String.Contains($SearchFor)
+      }
+      else
+      {
+        #from this answer on StackOverFlow: http://stackoverflow.com/a/444818/612954
+        # by JaredPar - http://stackoverflow.com/users/23283/jaredpar
+
+        #and just for reference: These lines do NOT work.
+        #Only this blog post finally told me what the correct syntax is: http://threemillion.net/blog/?p=331
+        #$index=$String.IndexOf($SearchFor, ([System.StringComparer]::OrdinalIgnoreCase))
+        #$index=$String.IndexOf($SearchFor, "System.StringComparison.OrdinalIgnoreCase")       
+        
+        #We could also use [StringComparison]::CurrentCultureIgnoreCase but it seems OrdinalIgnoreCase is better (Faster)
+        $result=( $String.IndexOf($SearchFor,[StringComparison]::OrdinalIgnoreCase) ) -ge 0
+      }
+    }
+
+    "StartsWith"
+    {
+      if ( $CaseSensitive ) 
+      {
+         $result=$String.StartsWith($SearchFor)
+      }
+      else
+      {
+         $result=$String.StartsWith($SearchFor,[StringComparison]::OrdinalIgnoreCase)
+      }
+    }
+
+
+  }
+  
+  return $result
+}
+
+
+#Yes, I'm aware of $env:TEMP but this will always return a 8+3 path, e.g. C:\USERS\ADMIN~1\AppData..."
 #This function returns the real path without that "~" garbage
 function Get-TempFolder() 
 {
@@ -417,7 +530,7 @@ function Start-TranscriptTaskSequence()
   [Parameter(Mandatory=$False)]
   [switch]$NewLog=$False
  )
- if ( Get-StringIsNullOrWhiteSpace $Name )
+ if ( Test-String -IsNullOrWhiteSpace $Name )
  {
   $Name=Split-Path -Path $myInvocation.ScriptName -Leaf   
  }
@@ -557,7 +670,7 @@ param(
    $type=[System.Windows.Forms.MessageBoxIcon]::Error
  }
 
- if ( Get-StringIsNullOrWhiteSpace $Titel ) 
+ if ( Test-String -IsNullOrWhiteSpace $Titel ) 
  {
     $Titel=$myInvocation.ScriptName
  }
@@ -650,12 +763,14 @@ param (
 }
 
 
-
 <#
  This is most basic way I could think of to represent a hash table with single string values as a file 
 
  ; Comment (INI style)
  # also understood as comment (PowerShell style)
+ ;Still a comment
+ ;Also this.
+
  Key1==Value1
  Key2==Value2
  ...
@@ -663,9 +778,9 @@ param (
 function Read-StringHashtable() {
 <#
   .SYNOPSIS
-  Reads a hashtable from a file where the key-value pairs are stored as Key==Value
+  Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
 
-   .PARAMETER File
+  .PARAMETER File
   The file to read the hashtable from
 
   .OUTPUTS
@@ -698,18 +813,13 @@ param(
        $line=$line -replace "´n",""
        $line=$line.Trim()
 
-       if ( !($line.StartsWith("#")) -and !($line.StartsWith(";")) -and !(Get-StringIsNullOrWhiteSpace $line) )
+       if ( !($line.StartsWith("#")) -and !($line.StartsWith(";")) -and !(Test-String -IsNullOrWhiteSpace $line) )
        {
          #this has to be a setting
          $setting=$line -split "=="
 
          if ( $setting.Count -ne 2 ) {
-             $format_exception = New-Object System.FormatException "Error parsing [$line] as key-value pair - did you forgot to use '=='?"
-             throw $format_exception
-             
-             #this code should never be reached
-             $result=@{}
-             break
+             throw New-Exception -InvalidFormat -Explanation "Error parsing [$line] as key-value pair - did you forgot to use '=='?"             
          }
          else
          {
@@ -721,8 +831,7 @@ param(
 
             if ( $result.ContainsKey($name) )
             {
-               $duplicate_exception= New-Object System.InvalidOperationException "A duplicate key [$name] (Value: $value) can not be added"
-               throw $duplicate_exception
+               throw New-Exception -InvalidOperation "Can not add key [$name] (Value: $value) because a key of this name already exists"
             }
             else 
             {
@@ -734,10 +843,8 @@ param(
   }
   else
   {
-     $filenotfound_exception = New-Object System.IO.FileNotFoundException "The file named $file does not exist or is not accessible"
-     throw $filenotfound_exception
+     throw New-Exception -FileNotFound "The file [$file] does not exist or is not accessible"
   }
-
  
  return $result
 }
@@ -799,8 +906,8 @@ param(
 
    [Parameter(Mandatory=$False,ValueFromPipeline=$True)]
    [switch]$RespectLeadingZeros=$false
-
  )   
+
  try
  {
    [version]$version=$Text
@@ -872,8 +979,7 @@ param(
          #Given that version can only hold Major.Minor.Build.Revision, we need to check if we have four or less entries
          if ( $verArray.Count -ge 5 )
          {
-            $exception=New-Object System.ArgumentOutOfRangeException "Parsing given text resulted in a version that is incompatible with System.Version ($verString)"
-            throw $exception
+            throw New-Exception -InvalidArgument "Parsing given text resulted in a version that is incompatible with System.Version ($verString)"
          }
          else
          {                                 
@@ -1026,7 +1132,7 @@ param (
    #parameters might be null
    if ( $help.parameters -ne $null  )
    {
-     #Temp object which will used to either store a single paramter or a pointer to the real parameter collection
+     #Temp object which will be used to either store a single paramter or just the real parameter collection
      $params=@()
 
      #parameters can be a string ?!??!?!?!
@@ -1077,6 +1183,7 @@ param (
 
   } #foreach
   
+
   #$qrList contains one or more objects we can use - check which output the caller wants
   switch ($Output)
   {
@@ -1148,14 +1255,14 @@ param (
      }
   }
 
-
 }
+
 
 function New-Dictionary()
 {
 <#
   .SYNOPSIS
-  Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by key as in a hashtable
+  Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by the key as in a hashtable
 
   .PARAMETER StringPairs
   Both the key and the value of the dictionary are strings. Accessing values using object[Key] is case-insensitve.
@@ -1176,10 +1283,10 @@ function New-Dictionary()
 #[OutputType([System.Collections.Generic.Dictionary])]  
 
 param (
-  [Parameter(ParameterSetName="KeyAndValueString", Mandatory=$false)]
+  [Parameter(ParameterSetName="KeyAndValueString", Mandatory=$true)]
   [switch]$StringPairs,
 
-  [Parameter(ParameterSetName="KeyStringValuePSObject", Mandatory=$false)]
+  [Parameter(ParameterSetName="KeyStringValuePSObject", Mandatory=$true)]
   [switch]$StringKey,
 
   [Parameter(ParameterSetName="DefineType", Mandatory=$true)]
@@ -1207,14 +1314,12 @@ param (
      $result=New-Object "System.Collections.Generic.Dictionary[string,PSObject]" -ArgumentList @([System.StringComparer]::OrdinalIgnoreCase)
     }
 
-
     "DefineType"
     {
      $result=New-Object "System.Collections.Generic.Dictionary[$KeyType,$ValueType]"     
     }
 
  }
-
  
  return $result
 }
@@ -1239,7 +1344,10 @@ function New-Exception()
   The exception is thrown because the operation is not valid due to the current state of the object
 
   .PARAMETER InvalidFormat
-  The exception is thrown because One of the identified items was in an invalid format
+  The exception is thrown because one of the identified items was in an invalid format
+
+  .PARAMETER FileNotFound
+  The exception is thrown because a file can not be found/accessed 
 
   .OUTPUTS
   System.Exception
@@ -1254,6 +1362,9 @@ param (
 
   [Parameter(ParameterSetName="FormatException", Mandatory=$true)]
   [switch]$InvalidFormat,
+
+  [Parameter(ParameterSetName="FileNotFoundException", Mandatory=$true)]
+  [switch]$FileNotFound,
   
   [Parameter(Mandatory=$false, Position=1)]
   [string]$Explanation,
@@ -1285,18 +1396,17 @@ param (
  {  
     "InvalidArgumentException"
     {
-      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      if ( Test-String -IsNullOrWhiteSpace $Explanation)
       { 
          $Explanation="Value does not fall within the expected range." 
       }
-
 
       $exception=New-Object System.ArgumentException "$caller$Explanation"
     }    
 
     "InvalidOperationException"
     {
-      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      if ( Test-String -IsNullOrWhiteSpace $Explanation)
       { 
          $Explanation="Operation is not valid due to the current state of the object."
       }
@@ -1306,7 +1416,7 @@ param (
 
     "FormatException"
     {
-      if ( Get-StringIsNullOrWhiteSpace $Explanation)
+      if ( Test-String -IsNullOrWhiteSpace $Explanation)
       { 
          $Explanation="One of the identified items was in an invalid format."
       }
@@ -1314,8 +1424,21 @@ param (
       $exception=New-Object System.FormatException "$caller$Explanation"
     }
 
+    "FileNotFoundException"
+    {
+      if ( Test-String -IsNullOrWhiteSpace $Explanation)
+      { 
+         $Explanation="Unable to find the specified file."
+      }
+            
+      $exception=New-Object System.IO.FileNotFoundException "$caller$Explanation"
+    }
+
   }
   
   return $exception
 }
+
+
+
 

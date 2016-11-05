@@ -1,6 +1,6 @@
 ﻿#Generate markdown overview for the functions in MPSXM
-#1.05
-#Michael Hex
+#Version 1.06
+#by Michael Hex
 
 #This script requires PowerShell 4.0 or higher 
 #requires -version 4.0
@@ -19,7 +19,7 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 
 
-cls
+Clear-Host
 
 #Document all in MPSXM by using a function from MPSXM :)
 Get-QuickReference -Module "MPSXM" -Output CommonMark

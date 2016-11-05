@@ -7,11 +7,18 @@ Just download it from [Releases](https://github.com/texhex/MPSXM/releases/latest
 
 You can also put it in the same directory where your script is and add it with ```Import-Module "$PSScriptRoot\MPSXM.psm1"```. 
 
+## Examples ##
+
+Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 
 ## Included Functions
 <!---------------------------------- START HERE ---------------------------------->
 <!---------------------------------- START HERE ---------------------------------->
 <!---------------------------------- START HERE ---------------------------------->
+
+
+
+
 
 
 
@@ -104,14 +111,14 @@ Get-RunningInISE
 ```
 
 ### Get-StringHasData ###
-Returns true if the string contains data (not $null, empty or only white spaces)
+Returns true if the string contains data (does not contain $null, empty or only white spaces). Uses [Test-String -HasData] internally.
 ```powershell
 Get-StringHasData [-string] <String>
 ```
  - *string* - The string value to be checked
 
 ### Get-StringIsNullOrWhiteSpace ###
-Returns true if the string is either $null, empty, or consists only of white-space characters.
+Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
 ```powershell
 Get-StringIsNullOrWhiteSpace [-string] <String>
 ```
@@ -124,10 +131,10 @@ Get-TempFolder
 ```
 
 ### New-Dictionary ###
-Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by key as in a hashtable
+Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by the key as in a hashtable
 ```powershell
-New-Dictionary [-StringPairs]
-New-Dictionary [-StringKey]
+New-Dictionary -StringPairs
+New-Dictionary -StringKey
 New-Dictionary -KeyType <String> -ValueType <String>
 ```
  - *StringPairs* - Both the key and the value of the dictionary are strings. Accessing values using object[Key] is case-insensitve.
@@ -141,15 +148,17 @@ Generates an exception ready to be thrown, the expected usage is [throw New-Exce
 New-Exception -InvalidArgument [[-Explanation] <String>] [-NoCallerName]
 New-Exception -InvalidOperation [[-Explanation] <String>] [-NoCallerName]
 New-Exception -InvalidFormat [[-Explanation] <String>] [-NoCallerName]
+New-Exception -FileNotFound [[-Explanation] <String>] [-NoCallerName]
 ```
  - *InvalidArgument* - The exception it thrown because of a value does not fall within the expected range
  - *InvalidOperation* - The exception is thrown because the operation is not valid due to the current state of the object
- - *InvalidFormat* - The exception is thrown because One of the identified items was in an invalid format
+ - *InvalidFormat* - The exception is thrown because one of the identified items was in an invalid format
+ - *FileNotFound* - The exception is thrown because a file can not be found/accessed
  - *Explanation* - A description why the exception is thrown. If empty, a standard text matching the type of exception beeing generated is used
  - *NoCallerName* - By default, the name of the function or script generating the exception is included in the explanation
 
 ### Read-StringHashtable ###
-Reads a hashtable from a file where the key-value pairs are stored as Key==Value
+Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
 ```powershell
 Read-StringHashtable [-File] <String>
 ```
@@ -187,7 +196,21 @@ Stops a transscript, but ignores if the host does not support it.
 Stop-TranscriptIfSupported
 ```
 
-
+### Test-String ###
+Tests the given string for a condition
+```powershell
+Test-String [[-String] <String>] -HasData
+Test-String [[-String] <String>] -IsNullOrWhiteSpace
+Test-String [[-String] <String>] -Contains [[-SearchFor] <String>] [-CaseSensitive]
+Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensitive]
+```
+ - *String* - The string the specified operation should be performed on
+ - *HasData* - Returns true if the string contains data (not $null, empty or only white spaces)
+ - *IsNullOrWhiteSpace* - Returns true if the string is either $null, empty, or consists only of white-space characters.
+ - *Contains* - Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
+ - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
+ - *SearchFor* - The string beeing sought
+ - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
 
 
 
