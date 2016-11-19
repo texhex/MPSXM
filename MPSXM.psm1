@@ -1368,6 +1368,9 @@ function New-Exception()
   .PARAMETER FileNotFound
   The exception is thrown because a file can not be found/accessed 
 
+  .PARAMETER DirectoryNotFound
+  The exception is thrown because a directory can not be found/accessed 
+
   .OUTPUTS
   System.Exception
 #>
@@ -1384,6 +1387,9 @@ param (
 
   [Parameter(ParameterSetName="FileNotFoundException", Mandatory=$true)]
   [switch]$FileNotFound,
+
+  [Parameter(ParameterSetName="DirectoryNotFoundException", Mandatory=$true)]
+  [switch]$DirectoryNotFound,
   
   [Parameter(Mandatory=$false, Position=1)]
   [string]$Explanation,
@@ -1451,6 +1457,16 @@ param (
       }
             
       $exception=New-Object System.IO.FileNotFoundException "$caller$Explanation"
+    }
+    
+    "DirectoryNotFoundException"
+    {
+      if ( Test-String -IsNullOrWhiteSpace $Explanation)
+      { 
+         $Explanation="Attempted to access a path that is not on the disk."
+      }
+            
+      $exception=New-Object System.IO.DirectoryNotFoundException "$caller$Explanation"
     }
 
   }

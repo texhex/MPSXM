@@ -169,11 +169,13 @@ New-Exception -InvalidArgument [[-Explanation] <String>] [-NoCallerName]
 New-Exception -InvalidOperation [[-Explanation] <String>] [-NoCallerName]
 New-Exception -InvalidFormat [[-Explanation] <String>] [-NoCallerName]
 New-Exception -FileNotFound [[-Explanation] <String>] [-NoCallerName]
+New-Exception -DirectoryNotFound [[-Explanation] <String>] [-NoCallerName]
 ```
  - *InvalidArgument* - The exception it thrown because of a value does not fall within the expected range
  - *InvalidOperation* - The exception is thrown because the operation is not valid due to the current state of the object
  - *InvalidFormat* - The exception is thrown because one of the identified items was in an invalid format
  - *FileNotFound* - The exception is thrown because a file can not be found/accessed
+ - *DirectoryNotFound* - The exception is thrown because a directory can not be found/accessed
  - *Explanation* - A description why the exception is thrown. If empty, a standard text matching the type of exception beeing generated is used
  - *NoCallerName* - By default, the name of the function or script generating the exception is included in the explanation
 
@@ -243,7 +245,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
 
 
 
