@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.17.0
+# Version 3.18.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -50,6 +50,10 @@ Set-StrictMode -version 2.0
 $ErrorActionPreference = 'Stop'
 
 
+#Next major version notes:
+# Get-StringIsNullOrWhiteSpace() should be deleted (replaced with Test-String)
+# Get-StringHasData() should be deleted (replaced with Test-String)
+# Get-RunningInISE() should be deleted (replaced with Test-InISE)
 
 function Get-CurrentProcessBitness()
 {
@@ -451,11 +455,26 @@ Function Get-ComputerLastBootupTime(){<#
 
   .OUTPUTS
   DateTime (Kind = Local) that is the last bootup time of this computer
-#>    [OutputType([datetime])] #param(#) $obj = Get-CIMInstance Win32_OperatingSystem -Property "LastBootupTime"  return $obj.LastBootUpTime}#From: http://stackoverflow.com/a/25224840#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)Function Get-RunningInISE()
+#>    [OutputType([datetime])] #param(#) $obj = Get-CIMInstance Win32_OperatingSystem -Property "LastBootupTime"  return $obj.LastBootUpTime}Function Get-RunningInISE()
 {
 <#
   .SYNOPSIS
-  Returns if the current script is executed by Windows PowerShell ISE 
+  Returns if the current script is executed by Windows PowerShell ISE (uses Test-IsISE internally)
+
+  .OUTPUTS
+  $TRUE if running in ISE, FALSE otherise
+#>    [OutputType([bool])]    
+param()    
+    
+ return Test-IsISE
+}
+
+
+#From: http://stackoverflow.com/a/25224840#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)Function Test-IsISE()
+{
+<#
+  .SYNOPSIS
+  Returns if the current script is executed by Windows PowerShell ISE
 
   .OUTPUTS
   $TRUE if running in ISE, FALSE otherise
@@ -1440,5 +1459,153 @@ param (
 }
 
 
+function Test-Admin ()
+{
+<#
+   .SYNOPSIS
+   Determines if the current powershell is elevated, that is running with administrator privileges 
+   
+   .OUTPUTS
+   bool
+#>
+[OutputType([bool])] 
+    #Source code copied from http://boxstarter.org/
+    #https://github.com/mwrock/boxstarter/blob/master/BoxStarter.Common/Test-Admin.ps1
+
+    $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
+    return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
+}
+
+function ConvertTo-DateTimeString()
+{
+<#
+  .SYNOPSIS
+  Converts a DateTime to a string as definied by ISO 8601. The result will be [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
+
+  .PARAMETER DateTime
+  The DateTime to be converted to a string
+
+  .PARAMETER UTC
+  Convert the DateTime to UTC before converting it to a string.
+
+  .PARAMETER ForceUTC
+  Ignore the time zone/kind (Local, Unknown, UTC) of the given DateTime and use it as if it were UTC already.
+
+  .PARAMETER HideMilliseconds
+  Do not include milliseconds in the result
+
+  .OUTPUTS
+  String
+#>
+[OutputType([String])]  
+param (
+  [Parameter(ParameterSetName="Default", Mandatory=$true, Position=1)]
+  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$true, Position=1)]
+  [Parameter(ParameterSetName="ForceUTC", Mandatory=$true, Position=1)]
+  [DateTime]$DateTime,
+  
+  [Parameter(ParameterSetName="Default", Mandatory=$false)]
+  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$false)]
+  [Parameter(ParameterSetName="ForceUTC", Mandatory=$false)]
+  [switch]$HideMilliseconds,
+
+  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$true)]
+  [switch]$UTC,
+
+  [Parameter(ParameterSetName="ForceUTC", Mandatory=$true)]
+  [switch]$ForceUTC
+)
+  
+  switch ($PsCmdlet.ParameterSetName)
+  {  
+     "Default"
+     {
+       $dt=$DateTime
+     }
+
+     "ConvertUTC"
+     {
+        if ( $UTC )
+        {
+          $dt=$DateTime.ToUniversalTime()
+        }
+     }
+
+     "ForceUTC"
+     {
+        if ( $ForceUTC )
+        {
+          $dt=[DateTime]::SpecifyKind($DateTime, "Utc")
+        }
+     }
+  }
+
+  #More about ISO 8601: https://en.wikipedia.org/wiki/ISO_8601
+  #Also: https://xkcd.com/1179/
+  $FORMAT_FULL="yyyy'-'MM'-'dd HH':'mm':'ss'.'fffK" #K will be replaced with the timezone or Z if UTC
+  $FORMAT_SHORT="yyyy'-'MM'-'dd HH':'mm':'ssK"
+
+  $formatString=$FORMAT_FULL
+
+  if ( $HideMilliseconds )
+  {
+     $formatString=$FORMAT_SHORT
+     
+     #This could be used to set the milliseconds to zero.
+     ##New-TimeSpan does not allow to define Milliseconds, so we use the .NET constructor
+     #$timespan=New-Object System.TimeSpan(0,0,0,0,$dt.Millisecond)
+     #$dt=$dt - $timespan
+  }
+   
+  return $dt.ToString($formatString)
+}
 
 
+function ConvertFrom-DateTimeString()
+{
+<#
+  .SYNOPSIS
+  Converts a string (created by ConvertTo-DateTimeString() to a DateTime. If the given string contains a time zone (...+/-01:00) the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
+
+  .PARAMETER DateTimeString
+  The string to be converted to a DateTime
+
+  .OUTPUTS
+  DateTime
+#>
+[OutputType([DateTime])]  
+param (
+  [Parameter(Mandatory=$true, Position=1)]
+  [string]$DateTimeString
+)
+
+  #More about ISO 8601: https://en.wikipedia.org/wiki/ISO_8601
+  #Also: https://xkcd.com/1179/
+  $FORMAT_FULL="yyyy'-'MM'-'dd HH':'mm':'ss'.'fffK" #K will be replaced with the timezone or Z if UTC
+  $FORMAT_SHORT="yyyy'-'MM'-'dd HH':'mm':'ssK"
+
+  $formatString=$FORMAT_SHORT
+
+  #We need to check if the string contains milliseconds or not so we can switch the format
+  if ( $DateTimeString.Length -ge 20 )
+  {
+     if ( $DateTimeString.Substring(19,1) -eq "." )
+     {
+        $formatString=$FORMAT_FULL      
+     }
+  }
+
+  #AssumeLocal - If no time zone is specified in the parsed string, the string is assumed to denote a local time.     
+  $dateTimeStyles=[System.Globalization.DateTimeStyles]::AssumeLocal
+  
+  #Check if the string ends with "Z", meaning UTC. In this case, we do not want it to be converted
+  if ( $DateTimeString.EndsWith("Z") )
+  {
+     $dateTimeStyles=[System.Globalization.DateTimeStyles]::AdjustToUniversal
+  }
+  
+  $dt=[DateTime]::ParseExact($DateTimeString, $formatString, [System.Globalization.CultureInfo]::InvariantCulture, $dateTimeStyles)
+ 
+  return $dt
+}

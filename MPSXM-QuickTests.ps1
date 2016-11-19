@@ -115,6 +115,59 @@ param(
 }
 
 
+function Test-DateTimeString()
+{
+param(
+ [Parameter(Mandatory=$True,Position=1)]
+ [DateTime]$TestDate
+)
+
+ write-host "DateTime Test: Input [$($TestDate.ToString("s"))] (Kind $($TestDate.Kind))"
+ 
+ $asString=ConvertTo-DateTimeString $TestDate
+ write-host "          ConvertTo: [$asString] (no parameter)"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+
+
+  $asString=ConvertTo-DateTimeString $TestDate -ForceUTC
+ write-host "          ConvertTo: [$asString] -ForceUTC"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+
+
+  $asString=ConvertTo-DateTimeString $TestDate -UTC
+ write-host "          ConvertTo: [$asString] -UTC"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+
+
+  $asString=ConvertTo-DateTimeString $TestDate -HideMilliseconds
+ write-host "          ConvertTo: [$asString] -HideMilliseconds"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+
+
+   $asString=ConvertTo-DateTimeString $TestDate -HideMilliseconds -ForceUTC
+ write-host "          ConvertTo: [$asString] -HideMilliseconds -ForceUTC"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+
+
+   $asString=ConvertTo-DateTimeString $TestDate -HideMilliseconds -UTC
+ write-host "          ConvertTo: [$asString] -HideMilliseconds -UTC"
+
+ $dateTimeFromString=ConvertFrom-DateTimeString $asString
+ write-host "        ConvertFrom: [$($dateTimeFromString.ToString("s"))] (Kind $($dateTimeFromString.Kind))"
+}
+
+
+
 Clear-Host
 write-host "Start"
 
@@ -311,10 +364,36 @@ write-host "Value from dictionary using only lower case letters: $($dict["abcdef
 write-host "---------------------------"
 
 
-Exit-Context -ExitCode 1
+write-host "Testing Exit-Context"
+#When executin PowerShell directly from a batch this will end it
+#Exit-Context -ExitCode 1
 
 #Try it: This will end your session
 #Exit-Context -ExitCode 2 -Force
+
+
+
+
+write-host "---------------------------"
+
+write-host "ConvertTo-DateTimeString() / ConvertFrom-DateTimeString() tests"
+
+ $dateTimeLocal=New-Object System.DateTime(2016,12,21,4,5,3,999,[DateTimeKind]::Local)
+$dateTimeUnspec=New-Object System.DateTime(2016,12,22,6,7,3,999,[DateTimeKind]::Unspecified)
+   $dateTimeUTC=New-Object System.DateTime(2016,12,23,8,9,3,999,[DateTimeKind]::Utc)
+
+write-host "***************"
+$ignored=Test-DateTimeString $dateTimeLocal
+write-host "***************"
+$ignored=Test-DateTimeString $dateTimeUnspec
+write-host "***************"
+$ignored=Test-DateTimeString $dateTimeUTC
+
+write-host "---------------------------"
+
+
+$result=Test-Admin
+write-host "Is current process admin: $result"
 
 write-host "---------------------------"
 
