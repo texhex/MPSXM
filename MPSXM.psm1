@@ -1463,13 +1463,13 @@ function Test-Admin ()
 {
 <#
    .SYNOPSIS
-   Determines if the current powershell is elevated, that is running with administrator privileges 
+   Determines if the current powershell is elevated (running with administrator privileges).
    
    .OUTPUTS
    bool
 #>
 [OutputType([bool])] 
-    #Source code copied from http://boxstarter.org/
+    #Code copied from http://boxstarter.org/
     #https://github.com/mwrock/boxstarter/blob/master/BoxStarter.Common/Test-Admin.ps1
 
     $identity  = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -1500,14 +1500,14 @@ function ConvertTo-DateTimeString()
 #>
 [OutputType([String])]  
 param (
-  [Parameter(ParameterSetName="Default", Mandatory=$true, Position=1)]
-  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$true, Position=1)]
   [Parameter(ParameterSetName="ForceUTC", Mandatory=$true, Position=1)]
+  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$true, Position=1)]
+  [Parameter(ParameterSetName="Default", Mandatory=$true, Position=1)]    
   [DateTime]$DateTime,
   
-  [Parameter(ParameterSetName="Default", Mandatory=$false)]
-  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$false)]
   [Parameter(ParameterSetName="ForceUTC", Mandatory=$false)]
+  [Parameter(ParameterSetName="ConvertUTC", Mandatory=$false)]
+  [Parameter(ParameterSetName="Default", Mandatory=$false)]   
   [switch]$HideMilliseconds,
 
   [Parameter(ParameterSetName="ConvertUTC", Mandatory=$true)]
@@ -1566,7 +1566,8 @@ function ConvertFrom-DateTimeString()
 {
 <#
   .SYNOPSIS
-  Converts a string (created by ConvertTo-DateTimeString() to a DateTime. If the given string contains a time zone (...+/-01:00) the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
+  Converts a string (created by ConvertTo-DateTimeString() to a DateTime.   If the given string contains a time zone (...+/-01:00),
+  the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
 
   .PARAMETER DateTimeString
   The string to be converted to a DateTime

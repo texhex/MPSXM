@@ -32,6 +32,26 @@ Add-RegistryValue [-Path] <String> [-Name] <String> [-Value] <String> -REG_SZ
  - *Value* - The value
  - *REG_SZ* - The data will be written as REG_SZ
 
+### ConvertFrom-DateTimeString ###
+Converts a string (created by ConvertTo-DateTimeString() to a DateTime.   If the given string contains a time zone (...+/-01:00),
+the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
+```powershell
+ConvertFrom-DateTimeString [-DateTimeString] <String>
+```
+ - *DateTimeString* - The string to be converted to a DateTime
+
+### ConvertTo-DateTimeString ###
+Converts a DateTime to a string as definied by ISO 8601. The result will be [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
+```powershell
+ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds]
+ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -UTC
+ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -ForceUTC
+```
+ - *DateTime* - The DateTime to be converted to a string
+ - *HideMilliseconds* - Do not include milliseconds in the result
+ - *UTC* - Convert the DateTime to UTC before converting it to a string.
+ - *ForceUTC* - Ignore the time zone/kind (Local, Unknown, UTC) of the given DateTime and use it as if it were UTC already.
+
 ### ConvertTo-HumanizedBytesString ###
 Returns a string optimized for readability.
 ```powershell
@@ -105,7 +125,7 @@ Get-RandomString [-Length] <Int32>
  - *Length* - The length of the string that should be generated.
 
 ### Get-RunningInISE ###
-Returns if the current script is executed by Windows PowerShell ISE
+Returns if the current script is executed by Windows PowerShell ISE (uses Test-IsISE internally)
 ```powershell
 Get-RunningInISE
 ```
@@ -196,6 +216,18 @@ Stops a transscript, but ignores if the host does not support it.
 Stop-TranscriptIfSupported
 ```
 
+### Test-Admin ###
+Determines if the current powershell is elevated (running with administrator privileges).
+```powershell
+Test-Admin
+```
+
+### Test-IsISE ###
+Returns if the current script is executed by Windows PowerShell ISE
+```powershell
+Test-IsISE
+```
+
 ### Test-String ###
 Tests the given string for a condition
 ```powershell
@@ -211,6 +243,8 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
+
+
 
 
 

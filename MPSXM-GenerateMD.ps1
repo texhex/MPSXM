@@ -26,7 +26,7 @@ Get-QuickReference -Module "MPSXM" -Output CommonMark
 
 
 #simple tests
-#Get-QuickReference "Get-RunningInISE"
+#Get-QuickReference "ConvertTo-DateTimeString"
 #Get-QuickReference "Add-RegistryValue" 
 
 #Get-QuickReference "Add-RegistryValue" -Output "CommonMark"
