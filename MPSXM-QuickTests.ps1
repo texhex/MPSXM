@@ -391,6 +391,41 @@ $ignored=Test-DateTimeString $dateTimeUTC
 
 write-host "---------------------------"
 
+write-host "ConvertTo-DateTimeUTC() / ConvertFrom-DateTimeUTC() tests"
+
+$dtSource=$dateTimeLocal
+write-host "Original time..........: $dtSource (Kind: $($dtSource.Kind))" 
+ $dtTest=ConvertTo-DateTimeUTC $dtSource -ForceUTC
+write-host "ToDateTimeUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+ $dtTest=ConvertTo-DateTimeUTC $dtSource
+write-host "ToDateTimeUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+
+$dtSource=$dateTimeUnspec
+write-host "Original time..........: $dtSource (Kind: $($dtSource.Kind))" 
+ $dtTest=ConvertTo-DateTimeUTC $dtSource -ForceUTC
+write-host "ToDateTimeUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+ $dtTest=ConvertTo-DateTimeUTC $dtSource
+write-host "ToDateTimeUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+
+$dtSource=$dateTimeUTC
+write-host "Original time..........: $dtSource (Kind: $($dtSource.Kind))" 
+ $dtTest=ConvertTo-DateTimeUTC $dtSource -ForceUTC
+write-host "ToDateTimeUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+ $dtTest=ConvertTo-DateTimeUTC $dtSource
+write-host "ToDateTimeUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+
+
+#Convert a UTC back to a local time
+write-host "Original time.........: $dateTimeUnspec (LocalTime)" 
+$dtInUTC=ConvertTo-DateTimeUTC $dateTimeUnspec
+write-host "Time in UTC...........: $dtInUTC" 
+$dtLocal=ConvertFrom-DateTimeUTC $dtInUTC
+write-host "Time in local timzeone: $dtLocal" 
+
+#Won't work because source is not in UTC
+#$crash=ConvertFrom-DateTimeUTC $dateTimeUnspec
+
+write-host "---------------------------"
 
 $result=Test-Admin
 write-host "Is current process admin: $result"

@@ -18,10 +18,6 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 
 
 
-
-
-
-
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Right now only string values are supported.
 ```powershell
@@ -33,12 +29,19 @@ Add-RegistryValue [-Path] <String> [-Name] <String> [-Value] <String> -REG_SZ
  - *REG_SZ* - The data will be written as REG_SZ
 
 ### ConvertFrom-DateTimeString ###
-Converts a string (created by ConvertTo-DateTimeString() to a DateTime.   If the given string contains a time zone (...+/-01:00),
+Converts a string (created by ConvertTo-DateTimeString() to a DateTime. If the given string contains a time zone (...+/-01:00),
 the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
 ```powershell
 ConvertFrom-DateTimeString [-DateTimeString] <String>
 ```
  - *DateTimeString* - The string to be converted to a DateTime
+
+### ConvertFrom-DateTimeUTC ###
+Converts a given Coordinated Universal Time (UTC) DateTime to local time.
+```powershell
+ConvertFrom-DateTimeUTC [-DateTime] <DateTime>
+```
+ - *DateTime* - The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
 
 ### ConvertTo-DateTimeString ###
 Converts a DateTime to a string as definied by ISO 8601. The result will be [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
@@ -50,7 +53,16 @@ ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -ForceUTC
  - *DateTime* - The DateTime to be converted to a string
  - *HideMilliseconds* - Do not include milliseconds in the result
  - *UTC* - Convert the DateTime to UTC before converting it to a string.
- - *ForceUTC* - Ignore the time zone/kind (Local, Unknown, UTC) of the given DateTime and use it as if it were UTC already.
+ - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and use it as if it were UTC already.
+
+### ConvertTo-DateTimeUTC ###
+Converts a given DateTime to a Coordinated Universal Time (UTC) DateTime.
+```powershell
+ConvertTo-DateTimeUTC [-DateTime] <DateTime> [-ForceUTC]
+```
+ - *DateTime* - The DateTime to be converted to UTC. A DateTime without time zone (Kind=Unspecified) is assumed to be in local time. Values already in UTC will be returned as is
+.
+ - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and return the same date and time as the input as UTC
 
 ### ConvertTo-HumanizedBytesString ###
 Returns a string optimized for readability.
@@ -245,6 +257,7 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
+
 
 
 

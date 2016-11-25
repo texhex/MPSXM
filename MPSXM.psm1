@@ -1687,7 +1687,7 @@ function ConvertFrom-DateTimeUTC()
 {
 <#
   .SYNOPSIS
-  Converts a given Coordinated Universal Time (UTC) DateTime and returns it in local time.
+  Converts a given Coordinated Universal Time (UTC) DateTime to local time.
 
   .PARAMETER DateTime
   The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
