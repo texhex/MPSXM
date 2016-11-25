@@ -1506,7 +1506,7 @@ function ConvertTo-DateTimeString()
   Convert the DateTime to UTC before converting it to a string.
 
   .PARAMETER ForceUTC
-  Ignore the time zone/kind (Local, Unknown, UTC) of the given DateTime and use it as if it were UTC already.
+  Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and use it as if it were UTC already.
 
   .PARAMETER HideMilliseconds
   Do not include milliseconds in the result
@@ -1552,7 +1552,8 @@ param (
      {
         if ( $ForceUTC )
         {
-          $dt=[DateTime]::SpecifyKind($DateTime, "Utc")
+          #$dt=[DateTime]::SpecifyKind($DateTime, "Utc")
+          $dt=ConvertTo-DateTimeUTC $DateTime -ForceUTC
         }
      }
   }
@@ -1582,7 +1583,7 @@ function ConvertFrom-DateTimeString()
 {
 <#
   .SYNOPSIS
-  Converts a string (created by ConvertTo-DateTimeString() to a DateTime.   If the given string contains a time zone (...+/-01:00),
+  Converts a string (created by ConvertTo-DateTimeString() to a DateTime. If the given string contains a time zone (...+/-01:00),
   the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
 
   .PARAMETER DateTimeString
@@ -1625,4 +1626,87 @@ param (
   $dt=[DateTime]::ParseExact($DateTimeString, $formatString, [System.Globalization.CultureInfo]::InvariantCulture, $dateTimeStyles)
  
   return $dt
+}
+
+
+function ConvertTo-DateTimeUTC()
+{
+<#
+  .SYNOPSIS
+  Converts a given DateTime to a Coordinated Universal Time (UTC) DateTime. 
+
+  .PARAMETER DateTime
+  The DateTime to be converted to UTC. A DateTime without time zone (Kind=Unspecified) is assumed to be in local time. Values already in UTC will be returned as is. 
+
+  .PARAMETER ForceUTC
+  Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and return the same date and time as the input as UTC
+
+  .OUTPUTS
+  DateTime
+#>
+[OutputType([DateTime])]  
+param (
+  [Parameter(Mandatory=$true, Position=1)]
+  [DateTime]$DateTime,
+  
+  [Parameter(Mandatory=$false)]
+  [switch]$ForceUTC
+)
+
+  if ( $ForceUTC )
+  {
+     return [DateTime]::SpecifyKind($DateTime, [DateTimeKind]::Utc)
+  }
+  else
+  {
+     switch ($DateTime.Kind)
+     {  
+        "Utc"
+        {
+           #That's easy
+           return [DateTime]$DateTime
+        }
+
+        "Local"
+        {
+           return [DateTime]$DateTime.ToUniversalTime()
+        }
+
+        default #Unspecified
+        {
+           $dt=[DateTime]::SpecifyKind($DateTime, [DateTimeKind]::Local)
+           return [DateTime]$dt.ToUniversalTime()
+        }
+
+     }
+  }
+}
+
+
+function ConvertFrom-DateTimeUTC()
+{
+<#
+  .SYNOPSIS
+  Converts a given Coordinated Universal Time (UTC) DateTime and returns it in local time.
+
+  .PARAMETER DateTime
+  The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
+
+  .OUTPUTS
+  DateTime
+#>
+[OutputType([DateTime])]  
+param (
+  [Parameter(Mandatory=$true, Position=1)]
+  [DateTime]$DateTime
+)
+
+  if ( $DateTime.Kind -eq [DateTimeKind]::Utc )
+  {
+     return $DateTime.ToLocalTime()
+  }
+  else
+  {
+     throw New-Exception -InvalidArgument "The given DateTime object must be in UTC"
+  }
 }
