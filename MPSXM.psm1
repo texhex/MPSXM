@@ -1553,7 +1553,7 @@ param (
         if ( $ForceUTC )
         {
           #$dt=[DateTime]::SpecifyKind($DateTime, "Utc")
-          $dt=ConvertTo-DateTimeUTC $DateTime -ForceUTC
+          $dt=ConvertTo-UTC $DateTime -ForceUTC
         }
      }
   }
@@ -1629,7 +1629,7 @@ param (
 }
 
 
-function ConvertTo-DateTimeUTC()
+function ConvertTo-UTC()
 {
 <#
   .SYNOPSIS
@@ -1683,7 +1683,7 @@ param (
 }
 
 
-function ConvertFrom-DateTimeUTC()
+function ConvertFrom-UTC()
 {
 <#
   .SYNOPSIS
