@@ -24,8 +24,8 @@ Clear-Host
 #Document all in MPSXM by using a function from MPSXM :)
 Get-QuickReference -Module "MPSXM" -Output CommonMark
 
-
 #simple tests
+#Get-QuickReference "Get-TrimmedString"
 #Get-QuickReference "ConvertTo-DateTimeString"
 #Get-QuickReference "Add-RegistryValue" 
 

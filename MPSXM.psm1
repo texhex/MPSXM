@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.18.0
+# Version 3.19.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -1710,3 +1710,124 @@ param (
      throw New-Exception -InvalidArgument "The given DateTime object must be in UTC"
   }
 }
+
+
+function Get-TrimmedString
+{
+<#
+  .SYNOPSIS
+   Removes white-space characters from the given string. By default, it removes all leading and trailing white-spaces chracters.
+
+  .PARAMETER String
+  The string to be trimmed
+
+  .PARAMETER StartOnly
+  Only remove leading white-space chracters
+
+  .PARAMETER EndOnly
+  Only remove trailing white-space chracters
+
+  .PARAMETER RemoveAll
+  Removes all white-space chracters from the string
+
+  .PARAMETER Equalize 
+  Removes all leading and trailing white-space characters, then replace any character considered to be a white-space with the standard white-space character (U+0020)
+
+  .PARAMETER RemoveDuplicates
+  Removes all leading and trailing white-space characters, then replace any white-space duplicates with 
+  one white-space (U+0020)
+
+
+  .OUTPUTS
+  string
+#>
+[OutputType([string])]  
+param (
+  #I have no idea why, but we need to reverse the order to make Get-Help return them in the correct order
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="RemoveAll")]
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="RemoveDuplicates")]  
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="Equalize")]
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="EndOnly")]
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="StartOnly")]
+  [Parameter(Mandatory=$false, Position=1, ParameterSetName="default")]    
+  [string]$String="", #not mandatory to allow passing an empty string
+
+  [Parameter(Mandatory=$true, ParameterSetName="StartOnly")]
+  [switch]$StartOnly,
+
+  [Parameter(Mandatory=$true, ParameterSetName="EndOnly")]
+  [switch]$EndOnly,
+
+  [Parameter(Mandatory=$true, ParameterSetName="Equalize")]
+  [switch]$Equalize,
+
+  [Parameter(Mandatory=$true, ParameterSetName="RemoveDuplicates")]
+  [switch]$RemoveDuplicates,
+
+  [Parameter(Mandatory=$true, ParameterSetName="RemoveAll")]
+  [switch]$RemoveAll
+)
+
+  switch ($PsCmdlet.ParameterSetName)
+  {  
+    "Default"
+    {    
+        return $String.Trim()
+    }
+
+    "StartOnly"
+    {
+        return $String.TrimStart()
+    }
+
+    "EndOnly"
+    {
+        return $String.TrimEnd()
+    }
+
+    "Equalize"
+    {
+        #Trim() uses internally the function Char.IsWhiteSpace so we should do the same
+        $sb = New-Object System.Text.StringBuilder
+        
+        $chars=$String.Trim().ToCharArray()
+        foreach ($char in $chars)
+        {
+           if ( [Char]::IsWhiteSpace($char) )
+           {
+                $sb.Append(" ") | Out-Null #ignore output from StringBuilder            
+           }
+           else
+           {
+                $sb.Append($char) | Out-Null  
+           }
+        }
+        
+        return $sb.ToString()
+    }
+
+    "RemoveAll"
+    {
+        #Change anything that is considered as white-space by .NET to " " (U0020)
+        $innerstring=Get-TrimmedString $String -Equalize
+        
+        #Now we can easily search for space and eliminate it
+        return $innerstring.Replace(" ","")
+    }
+
+    "RemoveDuplicates"
+    {        
+        $str=Get-TrimmedString $String -Equalize
+
+        while ( (Test-String $str -Contains "  ") )
+        {
+           $str=$str.Replace("  ", " ")
+        }
+
+        return $str
+    }
+
+  } #switch
+
+
+} #function 

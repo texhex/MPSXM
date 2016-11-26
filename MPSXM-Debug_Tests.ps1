@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 #Import 
 Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
-
+Clear-Host
 
 
 

@@ -245,6 +245,34 @@ Test-Function_TestStringStartsWith "abcdefgh" "def" $false
  
 write-host "---------------------------"
 
+
+write-host "Get-TrimmedString tests:"
+
+$testval="  Abc Def  "
+
+$result=Get-TrimmedString $testval
+write-host " Input: [$testval]; Get-TrimmedString ..........: [$result]"
+
+$result=Get-TrimmedString $testval -StartOnly
+write-host " Input: [$testval]; Get-TrimmedString -StartOnly: [$result]"
+
+$result=Get-TrimmedString $testval -EndOnly
+write-host " Input: [$testval]; Get-TrimmedString -EndOnly..: [$result]"
+
+$result=Get-TrimmedString $testval -RemoveAll
+write-host " Input: [$testval]; Get-TrimmedString -RemoveAll: [$result]"
+
+$result=Get-TrimmedString $testval -Equalize
+write-host " Input: [$testval]; Get-TrimmedString -Equalize.: [$result]"
+
+$testval="  Abc Def Ghi  JKLM  NOPQ     RST    "
+$result=Get-TrimmedString $testval -RemoveDuplicates
+write-host " Input: [$testval]; Get-TrimmedString -RemoveDuplicates: [$result]"
+
+
+write-host "---------------------------"
+
+
 write-host "Read String hashtable:"
 
 $hashtable=Read-StringHashtable -File "$PSScriptRoot\ExampleSettings.txt"
@@ -391,36 +419,37 @@ $ignored=Test-DateTimeString $dateTimeUTC
 
 write-host "---------------------------"
 
-write-host "ConvertTo-DateTimeUTC() / ConvertFrom-DateTimeUTC() tests"
+write-host "ConvertTo-UTC() / ConvertFrom-UTC() tests"
 
 $dtSource=$dateTimeLocal
-write-host "Original time..: $dtSource (Kind: $($dtSource.Kind))" 
+write-host " Original time..: $dtSource (Kind: $($dtSource.Kind))" 
  $dtTest=ConvertTo-UTC $dtSource -ForceUTC
-write-host "ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
  $dtTest=ConvertTo-UTC $dtSource
-write-host "ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
 
 $dtSource=$dateTimeUnspec
-write-host "Original time..: $dtSource (Kind: $($dtSource.Kind))" 
+write-host " Original time..: $dtSource (Kind: $($dtSource.Kind))" 
  $dtTest=ConvertTo-UTC $dtSource -ForceUTC
-write-host "ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
  $dtTest=ConvertTo-UTC $dtSource
-write-host "ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
 
 $dtSource=$dateTimeUTC
-write-host "Original time..: $dtSource (Kind: $($dtSource.Kind))" 
+write-host " Original time..: $dtSource (Kind: $($dtSource.Kind))" 
  $dtTest=ConvertTo-UTC $dtSource -ForceUTC
-write-host "ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC -ForceUTC: $dtTest (Kind: $($dtTest.Kind))"
  $dtTest=ConvertTo-UTC $dtSource
-write-host "ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
+write-host " ToUTC..........: $dtTest (Kind: $($dtTest.Kind))"
 
 
+$dtNow=Get-Date
 #Convert a UTC back to a local time
-write-host "Original time.........: $dateTimeUnspec (LocalTime)" 
-$dtInUTC=ConvertTo-UTC $dateTimeUnspec
-write-host "Time in UTC...........: $dtInUTC" 
+write-host "Original time...............: $dtNow (LocalTime)" 
+$dtInUTC=ConvertTo-UTC $dtNow
+write-host "Time in UTC.................: $dtInUTC" 
 $dtLocal=ConvertFrom-UTC $dtInUTC
-write-host "Time in local timzeone: $dtLocal" 
+write-host "Time in local timzeone again: $dtLocal" 
 
 #Won't work because source is not in UTC
 #$crash=ConvertFrom-DateTimeUTC $dateTimeUnspec
@@ -428,7 +457,7 @@ write-host "Time in local timzeone: $dtLocal"
 write-host "---------------------------"
 
 $result=Test-Admin
-write-host "Is current process admin: $result"
+write-host "Is the user admin: $result"
 
 write-host "---------------------------"
 

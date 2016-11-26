@@ -36,10 +36,10 @@ ConvertFrom-DateTimeString [-DateTimeString] <String>
 ```
  - *DateTimeString* - The string to be converted to a DateTime
 
-### ConvertFrom-DateTimeUTC ###
+### ConvertFrom-UTC ###
 Converts a given Coordinated Universal Time (UTC) DateTime to local time.
 ```powershell
-ConvertFrom-DateTimeUTC [-DateTime] <DateTime>
+ConvertFrom-UTC [-DateTime] <DateTime>
 ```
  - *DateTime* - The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
 
@@ -55,21 +55,20 @@ ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -ForceUTC
  - *UTC* - Convert the DateTime to UTC before converting it to a string.
  - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and use it as if it were UTC already.
 
-### ConvertTo-DateTimeUTC ###
-Converts a given DateTime to a Coordinated Universal Time (UTC) DateTime.
-```powershell
-ConvertTo-DateTimeUTC [-DateTime] <DateTime> [-ForceUTC]
-```
- - *DateTime* - The DateTime to be converted to UTC. A DateTime without time zone (Kind=Unspecified) is assumed to be in local time. Values already in UTC will be returned as is
-.
- - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and return the same date and time as the input as UTC
-
 ### ConvertTo-HumanizedBytesString ###
 Returns a string optimized for readability.
 ```powershell
 ConvertTo-HumanizedBytesString [-bytes] <Int64>
 ```
  - *bytes* - The value of bytes that should be returned as humanized string.
+
+### ConvertTo-UTC ###
+Converts a given DateTime to a Coordinated Universal Time (UTC) DateTime.
+```powershell
+ConvertTo-UTC [-DateTime] <DateTime> [-ForceUTC]
+```
+ - *DateTime* - The DateTime to be converted to UTC. A DateTime without time zone (Kind=Unspecified) is assumed to be in local time. Values already in UTC will be returned as is.
+ - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and return the same date and time as the input as UTC
 
 ### ConvertTo-Version ###
 Returns a VERSION object with the version number converted from the given text.
@@ -161,6 +160,24 @@ Returns a path to the temporary folder without any (8+3) paths in it
 ```powershell
 Get-TempFolder
 ```
+
+### Get-TrimmedString ###
+Removes white-space characters from the given string. By default, it removes all leading and trailing white-spaces chracters.
+```powershell
+Get-TrimmedString [[-String] <String>]
+Get-TrimmedString [[-String] <String>] -StartOnly
+Get-TrimmedString [[-String] <String>] -EndOnly
+Get-TrimmedString [[-String] <String>] -Equalize
+Get-TrimmedString [[-String] <String>] -RemoveDuplicates
+Get-TrimmedString [[-String] <String>] -RemoveAll
+```
+ - *String* - The string to be trimmed
+ - *StartOnly* - Only remove leading white-space chracters
+ - *EndOnly* - Only remove trailing white-space chracters
+ - *Equalize* - Removes all leading and trailing white-space characters, then replace any character considered to be a white-space with the standard white-space character (U+0020)
+ - *RemoveDuplicates* - Removes all leading and trailing white-space characters, then replace any white-space duplicates with 
+one white-space (U+0020)
+ - *RemoveAll* - Removes all white-space chracters from the string
 
 ### New-Dictionary ###
 Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by the key as in a hashtable
@@ -257,10 +274,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
-
-
-
 
  
  
