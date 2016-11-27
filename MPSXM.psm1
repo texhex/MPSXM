@@ -1032,6 +1032,9 @@ function Get-QuickReference()
   .PARAMETER Module
   Name specifies a module, a quick reference for all functions in the module should be generated 
 
+  .PARAMETER SortByNoun
+  If a module is given, the functions are sorted by verb (e.g. all Get-xxx together, all Set-xxx together). This can be changed to be sorted by Noun, the second part of a function.
+
   .PARAMETER Output
   If the output should be a string (default), CommonMark or the real objects
 
@@ -1047,7 +1050,11 @@ param (
   [System.String]$Output="String",
 
   [Parameter(Mandatory=$False)]
-  [switch]$Module
+  [switch]$Module,
+
+  [Parameter(Mandatory=$False)]
+  [switch]$SortByNoun
+
 )
  $qrList=@()
 
@@ -1158,51 +1165,53 @@ param (
   } #foreach
 
 
-  #By default, get-help will return the functions names from a module sorted by Verb, but not the noun.
-  #Given that some functions deal with the same nouns, it makes more sense to sort them by noun, then by verb.
-  $objectCount=($qrList | Measure-Object).Count
+  if ( $SortByNoun) 
+  {
+      #By default, get-help will return the functions names from a module sorted by Verb, but not the noun.
+      #Given that some functions deal with the same nouns, it makes more sense to sort them by noun, then by verb.
+      $objectCount=($qrList | Measure-Object).Count
 
-  if ( $objectCount -gt 1 )
-  {            
-     $dict=New-Dictionary -KeyType string -ValueType int
+      if ( $objectCount -gt 1 )
+      {            
+         $dict=New-Dictionary -KeyType string -ValueType int
 
-     for ($i = 0; $i -lt $qrList.Count; $i++) 
-     {
-        #We first need to reverse verb-noun to noun-verb
-        $curFunction=$qrList[$i].Name
-        $posHyphen=$curFunction.IndexOf("-")
-        $sortName=""
+         for ($i = 0; $i -lt $qrList.Count; $i++) 
+         {
+            #We first need to reverse verb-noun to noun-verb
+            $curFunction=$qrList[$i].Name
+            $posHyphen=$curFunction.IndexOf("-")
+            $sortName=""
 
-        if ( -not $posHyphen -ge 2)
-        {
-           #function doesn't use a hypen, use as is
-           $sortName=$curFunction
-        }
-        else
-        {
-           #Turn a function like "Get-Something" into "Something-Get"
-           $sortName=$curFunction.SubString($posHyphen+1)
-           $sortName+="-"
-           $sortName+=$curFunction.SubString(0,$posHyphen)        
-        }
+            if ( -not $posHyphen -ge 2)
+            {
+               #function doesn't use a hypen, use as is
+               $sortName=$curFunction
+            }
+            else
+            {
+               #Turn a function like "Get-Something" into "Something-Get"
+               $sortName=$curFunction.SubString($posHyphen+1)
+               $sortName+="-"
+               $sortName+=$curFunction.SubString(0,$posHyphen)        
+            }
 
-        $dict.Add($sortName, $i)
-     }
+            $dict.Add($sortName, $i)
+         }
 
-     #Now sort the list based on the name
-     $sortedList=$dict.GetEnumerator() | Sort-Object -Property "Key"
+         #Now sort the list based on the name
+         $sortedList=$dict.GetEnumerator() | Sort-Object -Property "Key"
 
-     #Create a new array with the original values in the new order
-     $qrListTemp=@()
-     foreach ($entry in $sortedList)
-     {
-       $qrListTemp +=$qrList[$entry.Value]
-     }
+         #Create a new array with the original values in the new order
+         $qrListTemp=@()
+         foreach ($entry in $sortedList)
+         {
+           $qrListTemp +=$qrList[$entry.Value]
+         }
 
-     #Replace the current qrList with the objects from this list
-     $qrList=$qrListTemp
+         #Replace the current qrList with the objects from this list
+         $qrList=$qrListTemp
+      }
   }
-  
 
   #$qrList contains one or more objects we can use - check which output the caller wants
   switch ($Output)

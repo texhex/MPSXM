@@ -22,7 +22,7 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 Clear-Host
 
 #Document all in MPSXM by using a function from MPSXM :)
-Get-QuickReference -Module "MPSXM" -Output CommonMark
+Get-QuickReference -Module "MPSXM" -Output CommonMark -SortByNoun
 
 #simple tests
 #Get-QuickReference "Get-TrimmedString"
