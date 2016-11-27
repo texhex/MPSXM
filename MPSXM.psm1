@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.19.0
+# Version 3.20.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -54,6 +54,7 @@ $ErrorActionPreference = 'Stop'
 # Get-StringIsNullOrWhiteSpace() should be deleted (replaced with Test-String)
 # Get-StringHasData() should be deleted (replaced with Test-String)
 # Get-RunningInISE() should be deleted (replaced with Test-InISE)
+# Add-RegistryValue() should be be deleted (replaced with Set-RegistryValue)
 
 function Get-CurrentProcessBitness()
 {
@@ -75,14 +76,14 @@ function Get-CurrentProcessBitness()
 #>
 [OutputType([bool])] 
 param (
-  [Parameter(ParameterSetName="64bit",Mandatory=$True)]
-  [switch]$Is64bit,
-
   [Parameter(ParameterSetName="32bit",Mandatory=$True)]
   [switch]$Is32bit,
 
   [Parameter(ParameterSetName="WoW",Mandatory=$True)]
-  [switch]$IsWoW
+  [switch]$IsWoW,
+
+  [Parameter(ParameterSetName="64bit",Mandatory=$True)]
+  [switch]$Is64bit
 )
 
   switch ($PsCmdlet.ParameterSetName)
@@ -148,11 +149,11 @@ function Get-OperatingSystemBitness()
 #>
 [OutputType([bool])] 
 param (
-  [Parameter(ParameterSetName="64bit",Mandatory=$True)]
-  [switch]$Is64bit,
-
   [Parameter(ParameterSetName="32bit",Mandatory=$True)]
-  [switch]$Is32bit
+  [switch]$Is32bit,
+
+  [Parameter(ParameterSetName="64bit",Mandatory=$True)]
+  [switch]$Is64bit
 )
 
   switch ($PsCmdlet.ParameterSetName)
@@ -706,52 +707,6 @@ param(
 }
 
 
-function Add-RegistryValue {
-<#
-  .SYNOPSIS
-  Adds a value to the given registry path. Right now only string values are supported.
-
-  .PARAMETER Path
-  The registry path, e.g. HKCU:\Software\TEMP\TSVARS
-
-  .PARAMETER Name
-  The name of the registry value 
-
-  .PARAMETER Value
-  The value 
-
-  .PARAMETER REG_SZ
-  The data will be written as REG_SZ
-
-  .OUTPUTS
-  None
-#>  
-param(
-  [Parameter(Mandatory=$True,Position=1)]
-  [ValidateNotNullOrEmpty()]
-  [string]$Path,
-
-  [Parameter(Mandatory=$True,Position=2)]
-  [ValidateNotNullOrEmpty()]
-  [string]$Name,
-
-  [Parameter(Mandatory=$True,Position=3)]
-  [ValidateNotNull()]
-  [string]$Value,
-
-  [Parameter(Mandatory=$True)]
-  [switch]$REG_SZ
-)
-
- if( !(Test-Path $Path) ) 
- {
-    $ignored=New-Item -Path $Path -Force 
- } 
-
- $ignored=New-ItemProperty -Path $path -Name $name -Value $value -PropertyType String -Force 
-}
-
-
 #From http://stackingcode.com/blog/2011/10/27/quick-random-string
 # by Adam Boddington
 function Get-RandomString { 
@@ -1201,6 +1156,52 @@ param (
    $qrList += $QuickRef
 
   } #foreach
+
+
+  #By default, get-help will return the functions names from a module sorted by Verb, but not the noun.
+  #Given that some functions deal with the same nouns, it makes more sense to sort them by noun, then by verb.
+  $objectCount=($qrList | Measure-Object).Count
+
+  if ( $objectCount -gt 1 )
+  {            
+     $dict=New-Dictionary -KeyType string -ValueType int
+
+     for ($i = 0; $i -lt $qrList.Count; $i++) 
+     {
+        #We first need to reverse verb-noun to noun-verb
+        $curFunction=$qrList[$i].Name
+        $posHyphen=$curFunction.IndexOf("-")
+        $sortName=""
+
+        if ( -not $posHyphen -ge 2)
+        {
+           #function doesn't use a hypen, use as is
+           $sortName=$curFunction
+        }
+        else
+        {
+           #Turn a function like "Get-Something" into "Something-Get"
+           $sortName=$curFunction.SubString($posHyphen+1)
+           $sortName+="-"
+           $sortName+=$curFunction.SubString(0,$posHyphen)        
+        }
+
+        $dict.Add($sortName, $i)
+     }
+
+     #Now sort the list based on the name
+     $sortedList=$dict.GetEnumerator() | Sort-Object -Property "Key"
+
+     #Create a new array with the original values in the new order
+     $qrListTemp=@()
+     foreach ($entry in $sortedList)
+     {
+       $qrListTemp +=$qrList[$entry.Value]
+     }
+
+     #Replace the current qrList with the objects from this list
+     $qrList=$qrListTemp
+  }
   
 
   #$qrList contains one or more objects we can use - check which output the caller wants
@@ -1831,3 +1832,213 @@ param (
 
 
 } #function 
+
+
+function Add-RegistryValue {
+<#
+  .SYNOPSIS
+  Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
+
+  .PARAMETER Path
+  The registry path, e.g. HKCU:\Software\TEMP\TSVARS
+
+  .PARAMETER Name
+  The name of the registry value 
+
+  .PARAMETER Value
+  The value 
+
+  .PARAMETER REG_SZ
+  The data will be written as REG_SZ
+
+  .OUTPUTS
+  None
+#>  
+param(
+  [Parameter(Mandatory=$True,Position=1)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path,
+
+  [Parameter(Mandatory=$True,Position=2)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Name,
+
+  [Parameter(Mandatory=$True,Position=3)]
+  [ValidateNotNull()]
+  [string]$Value,
+
+  [Parameter(Mandatory=$True)]
+  [switch]$REG_SZ
+)
+
+ if( !(Test-Path $Path) ) 
+ {
+    $ignored=New-Item -Path $Path -Force 
+ } 
+
+ $ignored=New-ItemProperty -Path $path -Name $name -Value $value -PropertyType String -Force 
+}
+
+
+function Set-RegistryValue
+{
+<#
+  .SYNOPSIS
+  Writes a registry value in the given registry path. 
+
+  .PARAMETER Path
+  The registry path, e.g. HKCU\Software\MPSXM\
+
+  .PARAMETER Name
+  The name of the registry value. If not defined, the (default) value is used
+
+  .PARAMETER Value
+  The value to be written
+
+  .PARAMETER Type
+  The data type used in the registry (REG_xx). If not specified, the type of the given value will be used to assign DWord, QWord or String.
+
+  .OUTPUTS
+  None
+#>  
+param(
+  [Parameter(Mandatory=$true,Position=1)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path,
+
+  [Parameter(Mandatory=$false)]
+  [string]$Name,
+
+  [Parameter(Mandatory=$true)]
+  [ValidateNotNull()]
+  $Value,
+
+  [Parameter(Mandatory=$false)]
+  [Microsoft.Win32.RegistryValueKind]$Type=[Microsoft.Win32.RegistryValueKind]::Unknown
+)
+
+ #Normal registry path just use ROOT\Path e.g. HKCU\Software\MPSXM. PowerShell (because it uses a provider) uses ROOT:\Path
+ #Check if the fifth character is a ":" and if not, add it so PowerShell knows we want to write to the registry
+ if ( ($Path.Substring(4,1) -eq ":") )
+ {
+    $regPath=$Path    
+ }
+ else
+ {
+    $regPath=$Path.Insert(4,":")
+ }
+
+ #Create the path if it does not exist
+ if( -not (Test-Path $regPath -PathType Container) ) 
+ {
+    $ignored=New-Item -Path $regPath -Force 
+ } 
+
+ #check if value name was given. If not, write to (default)
+ if ( Test-String -IsNullOrWhiteSpace $Name )
+ {
+   #default values only support string, so we always convert to string
+   $ignored=Set-Item -Path $regPath -Value $value.ToString()
+ }
+ else
+ {
+   if ( $Type -eq [Microsoft.Win32.RegistryValueKind]::Unknown )
+   {
+     #type was not given, figure it out ourselves
+     #"String, ExpandString, Binary, DWord, MultiString, QWord, Unknown".
+     if ( $Value -is [int]) 
+     {
+        $Type=[Microsoft.Win32.RegistryValueKind]::DWord
+     }
+     elseif ( $Value -is [long])
+     {
+        $Type=[Microsoft.Win32.RegistryValueKind]::QWord
+     }
+     else
+     {
+       $Type=[Microsoft.Win32.RegistryValueKind]::String
+     }
+   }
+   
+   $ignored=New-ItemProperty -Path $regPath -Name $name -Value $value -PropertyType $Type -Force 
+ }
+}
+
+
+
+function Get-RegistryValue
+{
+<#
+  .SYNOPSIS
+  Reads a registry value.
+
+  .PARAMETER Path
+  The registry path, e.g. HKCU\Software\MPSXM\
+
+  .PARAMETER Name
+  The name of the registry value to be read. If not defined, the (default) value is used
+
+  .PARAMETER DefaultValue
+  The value to return if name does not exist. If not defined, $null is returned if Name does not exist
+
+  .OUTPUTS
+  Varies
+#>  
+param(
+  [Parameter(Mandatory=$true,Position=1)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path,
+
+  [Parameter(Mandatory=$false)]
+  [string]$Name,
+
+  [Parameter(Mandatory=$false)]
+  $DefaultValue=$null
+)
+
+ #Normal registry path just use ROOT\Path e.g. HKCU\Software\MPSXM. PowerShell (because it uses a provider) uses ROOT:\Path
+ #Check if the fifth character is a ":" and if not, add it so PowerShell knows we want to write to the registry
+ if ( ($Path.Substring(4,1) -eq ":") )
+ {
+    $regPath=$Path    
+ }
+ else
+ {
+    $regPath=$Path.Insert(4,":")
+ } 
+ 
+ if( -not (Test-Path $regPath -PathType Container) ) 
+ {
+   #Path does not exist, return default value
+   return $DefaultValue
+ }
+ else
+ {
+    #This commands read ALL values from the path. No idea if this is bad or can be ignored.
+    $regVals=Get-ItemProperty -Path $regPath
+    if( -not $regVals )
+    {
+       return $DefaultValue
+    }
+    else
+    {
+       #Was a name given? If not, use (default)
+       if ( Test-String -IsNullOrWhiteSpace $Name)
+       {
+          $Name="(default)"
+       }   
+
+        $regValue=Get-Member -InputObject $regVals -Name $Name
+        if( -not $regValue )
+        {
+           return $DefaultValue
+        }
+        else
+        {
+           #return the real value
+           return $regVals.$Name
+        }       
+    }
+ }
+
+}
