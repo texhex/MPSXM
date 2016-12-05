@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.20.0
+# Version 3.21.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2016 Michael 'Tex' Hex 
@@ -2050,4 +2050,203 @@ param(
     }
  }
 
+}
+
+
+function Get-FileName()
+{
+<#
+  .SYNOPSIS
+  Returns the filename (with or without the extension) from a path string
+
+  .PARAMETER Path
+  The string path containing a filename, e.g. C:\Path\MyFile.txt
+
+  .PARAMETER WithoutExtension
+  Return the filename without extension (MyFile.txt would be returned as MyFile)
+
+  .OUTPUTS
+  String
+#>  
+[OutputType([string])]  
+ param(
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path,
+
+  [Parameter(Mandatory=$false)]
+  [Switch]$WithoutExtension=$false
+)
+    if ( $WithoutExtension )
+    {        
+        return [System.IO.Path]::GetFileNameWithoutExtension($Path)
+    }
+    else
+    {
+        return [System.IO.Path]::GetFileName($Path)
+    }
+}
+
+
+function Get-ContainingDirectory()
+{
+<#
+  .SYNOPSIS
+  Returns the directory containing the item defined in the path string
+
+  .PARAMETER Path
+  The string path e.g. C:\Path\MyFile.txt
+
+  .OUTPUTS
+  String
+#>  
+[OutputType([string])]  
+ param(
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path
+)
+
+  #The problem with this function is that it returns different results depending on if the path ends with "\" or not
+  
+  #When $Directory ends with "\", the return is the $Directory without "\"
+  #If not, the return is the containing directory
+  
+  #Hence, we make sure the $Directory does not end with "\"
+  $folder=Join-Path -Path $Path -ChildPath "\" #first add it in case the input was broken, e.g. ends with two "\"
+  $folder=$folder.TrimEnd("\")
+
+  return [System.IO.Path]::GetDirectoryName($folder)
+}
+
+
+function Test-DirectoryExists()
+{
+<#
+  .SYNOPSIS
+  Returns if a the given directory exists
+
+  .PARAMETER Path
+  The string path of a directory, e.g. C:\Windows
+
+  .OUTPUTS
+  boolean
+#>  
+[OutputType([bool])]  
+ param(
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path
+)
+  return Test-Path -Path $Path -PathType Container
+}
+
+function Test-FileExists()
+{
+<#
+  .SYNOPSIS
+  Returns if a the given file exists
+
+  .PARAMETER Path
+  The string path of the fiel , e.g. C:\Temp\MyFile.txt"
+
+  .OUTPUTS
+  boolean
+#>  
+[OutputType([bool])]  
+ param(
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Path
+)
+  return Test-Path -Path $Path -PathType Leaf
+}
+
+function Copy-FileToDirectory()
+{
+<#
+  .SYNOPSIS
+  Copies a file to a directory, overwritting any existing copy
+
+  .PARAMETER Filename
+  The full path to a file, e.g. C:\Temp\Testfile.txt
+
+  .PARAMETER Directory
+  Path to the destination directory, e.g. C:\Windows\Temp
+#>  
+ param(
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Filename,
+
+  [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+  [ValidateNotNullOrEmpty()]
+  [string]$Directory
+)
+
+ if ( -not (Test-FileExists $Filename) )
+ {
+    throw New-Exception -FileNotFound "The file [$Filename] does not exist"
+ } 
+ 
+ $dest=Join-Path -Path $Directory -ChildPath "\"
+
+ if ( -not (Test-DirectoryExists $dest) )
+ {
+    throw New-Exception -DirectoryNotFound "The destination directory [$dest] does not exist"
+ }
+
+ $ignored=Copy-Item -Path $Filename -Destination $dest -Force
+}
+
+
+function ConvertTo-Array()
+{
+<#
+  .SYNOPSIS
+  Convert a single value or a list of objects to an array so a foreach() call works always 
+
+  .PARAMETER InputObject
+  A single object, a list of objects or $null
+#>  
+ param(
+  [Parameter(Mandatory=$false,ValueFromPipeline=$True)]
+  $InputObject
+)
+
+    #if it's null, return an empty array
+    if ( $InputObject -eq $null )  
+    {      
+        $empty=@()
+        
+        #This rather strange syntax is needed because we want to return an empty array. 
+        #Thank Ansgar Wiechers for the solution: http://stackoverflow.com/a/18477004
+        return ,$empty        
+    }    
+    else
+    {
+        #get the number of objects in the list      
+        $count=($InputObject| Measure-Object).Count
+        $array=@()
+        
+        if ( $count -le 0 )
+        {
+            #same as above regarding empty array return
+            return ,$array
+        }
+        elseif ( $count -eq 1 )
+        {
+            #this extra step is required because elements with count 1 sometimes can not be retrieved by foreach
+            $array+=$InputObject
+            return ,$array
+        }
+        else
+        {
+            foreach($item in $InputObject)
+            {          
+                $array+=$item
+            }
+            return $array
+        }
+    }
 }

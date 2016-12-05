@@ -350,8 +350,34 @@ write-host "Show message box HUGE Test..."
 
 write-host "---------------------------"
 
-write-host "Writing registry value..."
-Add-RegistryValue -Path "HKCU:\Software\TEMP\TESTING" -Name "TESTVALUE" -Value "Yes" -REG_SZ
+write-host "Registry tests"
+$regPath="HKCU\Software\MPSXM"
+
+#Write to (Default) value
+Set-RegistryValue -Path $regPath -Value "Value for (default)"
+
+#Write as REG_DWORD because the value is an int
+Set-RegistryValue -Path $regPath -Name "My DWORD Value" -Value 1
+
+#Write as REG_QWORD because the value is a long
+Set-RegistryValue -Path $regPath -Name "My QWORD Value" -Value ([long]123)
+
+#Write an int as REQ_QWORD by using the prameter QWordb
+Set-RegistryValue -Path $regPath -Name "My QWORD Value 2" -Value 2 -Type QWord
+
+
+$testRead=Get-RegistryValue -Path $regPath -Name "My DWORD Value"
+write-host "Read My DWORD Value: [$testRead]"
+
+$testRead=Get-RegistryValue -Path $regPath -Name "My DWORD Value DOES NOT EXIST" -DefaultValue 999
+write-host "Read My DWORD Value: [$testRead]"
+
+$testRead=Get-RegistryValue -Path $regPath -DefaultValue "Not set"
+write-host "Read (Default) value: [$testRead]"
+
+$testRead=Get-RegistryValue -Path "$regPath\XyZ" -DefaultValue "Default Value"
+write-host "Read (Default) value non existing path: [$testRead]"
+
 
 write-host "---------------------------"
 
@@ -460,6 +486,31 @@ $result=Test-Admin
 write-host "Is the user admin: $result"
 
 write-host "---------------------------"
+
+$testpath="C:\mypath\MyFile.txt"
+
+$result=Get-FileName $testpath
+write-host "Path is $testpath - Get-Filename = $result"
+
+$result=Get-FileName $testpath -WithoutExtension
+write-host "Path is $testpath - Get-Filename -WithoutExtension = $result"
+
+$result=Get-ContainingDirectory $testpath
+write-host "Path is $testpath - Get-ContainingDirectory = $result"
+
+$testpath="C:\mypath\"
+$result=Get-ContainingDirectory $testpath
+write-host "Path is $testpath - Get-ContainingDirectory = $result"
+
+$testpath="C:\NOT-EXISTING-PATH\"
+$result=Test-DirectoryExists $testpath
+write-host "Path is $testpath - Test-DirectoryExists = $result"
+
+$testpath="C:\Windows"
+$result=Test-DirectoryExists $testpath
+write-host "Path is $testpath - Test-DirectoryExists = $result"
+
+
 
 
 write-host " "

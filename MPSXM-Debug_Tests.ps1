@@ -15,19 +15,22 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 Clear-Host
 
-$reg="HKCU\Software\MPSXM"
+#Copy-FileToDirectory "C:\Temp\Run_Me.txt" -Directory "C:\GNARF"
 
-#Set-RegistryValue -Path $regPath -Value "Value of default key"
-#Set-RegistryValue -Path $regPath -Name "RegTest 1" -Value 0
+$null
 
+$input=$null
+$testArray=ConvertTo-Array $input
+write-host "Input: [$input] - ConvertTo-Array: (Count $($testArray.Count)): $testArray"
 
-#Set-RegistryValue -Path $regPath -Name $null -Value 0
+$input=123
+$testArray=ConvertTo-Array $input
+write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
 
-#Write to (Default) value
-Set-RegistryValue -Path $reg -Value "Value for (default)"
+$input=@("")
+$testArray=ConvertTo-Array $input
+write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
 
-#Write as REG_DWORD because the value is an int
-Set-RegistryValue -Path $regPath -Name "My DWORD Value" -Value 1
 
 #Write as REG_QWORD because the value is a long
 Set-RegistryValue -Path $regPath -Name "My QWORD Value" -Value ([long]123)
