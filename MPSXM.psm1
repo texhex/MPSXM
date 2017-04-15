@@ -2205,7 +2205,7 @@ function ConvertTo-Array()
 {
 <#
   .SYNOPSIS
-  Convert a single value or a list of objects to an array; this way array.Count or a foreach() loop always works. An input of $null will result in a array with count 0.
+  Convert a single value or a list of objects to an array; this way (Array).Count or a ForEach() loop always works. An input of $null will result in an array with length 0.
 
   .PARAMETER InputObject
   A single object, a list of objects or $null

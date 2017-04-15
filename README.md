@@ -45,7 +45,7 @@ ConvertFrom-UTC [-DateTime] <DateTime>
  - *DateTime* - The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
 
 ### ConvertTo-Array ###
-Convert a single value or a list of objects to an array; this way array.Count or a foreach() loop always works. An input of $null will result in a array with count 0.
+Convert a single value or a list of objects to an array; this way (Array).Count or a ForEach() loop always works. An input of $null will result in an array with length 0.
 ```powershell
 ConvertTo-Array [[-InputObject] <Object>]
 ```
@@ -340,8 +340,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
-
 
  
  
