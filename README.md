@@ -18,6 +18,7 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 
 
 
+
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
 ```powershell
@@ -43,8 +44,15 @@ ConvertFrom-UTC [-DateTime] <DateTime>
 ```
  - *DateTime* - The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
 
+### ConvertTo-Array ###
+Convert a single value or a list of objects to an array; this way array.Count or a foreach() loop always works. An input of $null will result in a array with count 0.
+```powershell
+ConvertTo-Array [[-InputObject] <Object>]
+```
+ - *InputObject* - A single object, a list of objects or $null
+
 ### ConvertTo-DateTimeString ###
-Converts a DateTime to a string as definied by ISO 8601. The result will be [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
+Converts a DateTime to a string as definied by ISO 8601. The result will be in the format [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
 ```powershell
 ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds]
 ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -UTC
@@ -78,6 +86,14 @@ ConvertTo-Version [[-Text] <String>] [-RespectLeadingZeros]
  - *Text* - The input string to be converted, e.g. 1.3.44.
  - *RespectLeadingZeros* - Respect leading zeros by shifting the parts right, e.g. 1.02.3 becomes 1.0.2.3.
 
+### Copy-FileToDirectory ###
+Copies a file to a directory, overwritting any existing copy
+```powershell
+Copy-FileToDirectory [-Filename] <String> [-Directory] <String>
+```
+ - *Filename* - The full path to a file, e.g. C:\Temp\Testfile.txt
+ - *Directory* - Path to the destination directory, e.g. C:\Windows\Temp
+
 ### Exit-Context ###
 Will exit from the current context and sets an exit code. Nothing will be done when running in ISE.
 ```powershell
@@ -92,6 +108,13 @@ Returns the date and time of the last bootup time of this computer.
 Get-ComputerLastBootupTime
 ```
 
+### Get-ContainingDirectory ###
+Returns the directory containing the item defined in the path string
+```powershell
+Get-ContainingDirectory [-Path] <String>
+```
+ - *Path* - The string path e.g. C:\Path\MyFile.txt
+
 ### Get-CurrentProcessBitness ###
 Returns information about the current powershell process.
 ```powershell
@@ -102,6 +125,14 @@ Get-CurrentProcessBitness -Is64bit
  - *Is32bit* - Returns $True if the current script is running as 32-bit process.
  - *IsWoW* - Returns $True if the current script is running as 32-bit process on a 64-bit machine (Windows on Windows).
  - *Is64bit* - Returns $True if the current script is running as 64-bit process.
+
+### Get-FileName ###
+Returns the filename (with or without the extension) from a path string
+```powershell
+Get-FileName [-Path] <String> [-WithoutExtension]
+```
+ - *Path* - The string path containing a filename, e.g. C:\Path\MyFile.txt
+ - *WithoutExtension* - Return the filename without extension (MyFile.txt would be returned as MyFile)
 
 ### Get-ModuleAvailable ###
 Returns true if the module exist; it uses a a method that is about 10 times faster then using Get-Module -ListAvailable
@@ -120,7 +151,8 @@ Get-OperatingSystemBitness -Is64bit
  - *Is64bit* - Returns $True if the current operating system is 64-bit
 
 ### Get-QuickReference ###
-Returns a quick reference about the given function or all functions in the module (if you are on GitHub, this text was generated with it).
+Returns a quick reference about the given function or all functions in the module. The text returned includes function name, call syntax and parameters extracted from the function itself. 
+If you are on GitHub: the entire reference page was generated with it.
 ```powershell
 Get-QuickReference [-Name] <String> [-Output <String>] [-Module] [-SortByNoun]
 ```
@@ -273,6 +305,20 @@ Determines if the current powershell is elevated (running with administrator pri
 Test-Admin
 ```
 
+### Test-DirectoryExists ###
+Returns if a the given directory exists
+```powershell
+Test-DirectoryExists [-Path] <String>
+```
+ - *Path* - The string path of a directory, e.g. C:\Windows
+
+### Test-FileExists ###
+Returns if a the given file exists
+```powershell
+Test-FileExists [-Path] <String>
+```
+ - *Path* - The string path of the fiel , e.g. C:\Temp\MyFile.txt"
+
 ### Test-IsISE ###
 Returns if the current script is executed by Windows PowerShell ISE
 ```powershell
@@ -297,7 +343,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
 
 
 
-
  
  
 <!---------------------------------- STOP HERE ---------------------------------->
@@ -308,4 +353,4 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
 Any constructive contribution is very welcome! If you encounter a bug or have an addition, please create a [new issue](https://github.com/texhex/MPSXM/issues/new).
 
 ## License
-Copyright © 2016 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.
+Copyright © 2016-2017 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.

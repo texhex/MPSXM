@@ -31,26 +31,13 @@ $input=@("")
 $testArray=ConvertTo-Array $input
 write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
 
+$input=@("abc")
+$testArray=ConvertTo-Array $input
+write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
 
-#Write as REG_QWORD because the value is a long
-Set-RegistryValue -Path $regPath -Name "My QWORD Value" -Value ([long]123)
-
-#Write an int as REQ_QWORD by using the prameter QWordb
-Set-RegistryValue -Path $regPath -Name "My QWORD Value 2" -Value 2 -Type QWord
-
-
-$testRead=Get-RegistryValue -Path $regPath -Name "My DWORD Value"
-write-host "Read My DWORD Value: [$testRead]"
-
-$testRead=Get-RegistryValue -Path $regPath -Name "My DWORD Value DOES NOT EXIST" -DefaultValue 999
-write-host "Read My DWORD Value: [$testRead]"
-
-$testRead=Get-RegistryValue -Path $regPath -DefaultValue "Not set"
-write-host "Read (Default) value: [$testRead]"
-
-$testRead=Get-RegistryValue -Path "$regPath\XyZ" -DefaultValue "Default Value"
-write-host "Read (Default) value non existing path: [$testRead]"
-
+$input=@("abc", "def")
+$testArray=ConvertTo-Array $input
+write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
 
 
 write-host "*** ENDE ***"

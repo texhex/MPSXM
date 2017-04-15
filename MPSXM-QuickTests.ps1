@@ -167,7 +167,6 @@ param(
 }
 
 
-
 Clear-Host
 write-host "Start"
 
@@ -490,26 +489,114 @@ write-host "---------------------------"
 $testpath="C:\mypath\MyFile.txt"
 
 $result=Get-FileName $testpath
-write-host "Path is $testpath - Get-Filename = $result"
+write-host "Get-Filename `"$testpath`": [$result]"
 
 $result=Get-FileName $testpath -WithoutExtension
-write-host "Path is $testpath - Get-Filename -WithoutExtension = $result"
+write-host "Get-Filename `"$testpath`" -WithoutExtension: [$result]"
 
-$result=Get-ContainingDirectory $testpath
-write-host "Path is $testpath - Get-ContainingDirectory = $result"
+write-host "---------------------------"
 
-$testpath="C:\mypath\"
+$testpath="C:\Windows\Win31.exe"
+$result=Test-FileExists $testpath
+write-host "Test-FileExists `"$testpath`": $result"
+
+$testpath="C:\Windows\explorer.exe"
+$result=Test-FileExists $testpath
+write-host "Test-FileExists `"$testpath`": $result"
+
+write-host "---------------------------"
+
+$testpath="C:\Windows\System32\drivers\etc\hosts"
 $result=Get-ContainingDirectory $testpath
-write-host "Path is $testpath - Get-ContainingDirectory = $result"
+write-host "Get-ContainingDirectory `"$testpath`": [$result]"
+
+$testpath="\\my-file-server\group4\data\List.xlsx"
+$result=Get-ContainingDirectory $testpath
+write-host "Get-ContainingDirectory `"$testpath`": [$result]"
+
+$testpath="C:\mypath\MyFile.txt"
+$result=Get-ContainingDirectory $testpath
+write-host "Get-ContainingDirectory `"$testpath`": [$result]"
+
+$testpath="C:\mypath"
+$result=Get-ContainingDirectory $testpath
+write-host "Get-ContainingDirectory `"$testpath`": [$result]"
+
+write-host "---------------------------"
 
 $testpath="C:\NOT-EXISTING-PATH\"
 $result=Test-DirectoryExists $testpath
-write-host "Path is $testpath - Test-DirectoryExists = $result"
+write-host "Test-DirectoryExists `"$testpath`": $result"
 
 $testpath="C:\Windows"
 $result=Test-DirectoryExists $testpath
-write-host "Path is $testpath - Test-DirectoryExists = $result"
+write-host "Test-DirectoryExists `"$testpath`": $result"
 
+write-host "---------------------------"
+
+$sourceFile="C:\windows\win.ini"
+$destFolder=$env:TEMP
+
+write-host "Copy-FileToDirectory -Filename `"$sourceFile`" -Directory `"$destFolder`""
+Copy-FileToDirectory -Filename $sourceFile -Directory $destFolder
+write-host "---------------------------"
+
+write-host "Testing ConvertTo-Array()"
+
+write-host "Input is (`$Null)"
+$array=ConvertTo-Array $null
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+$input=""
+write-host "Input is (empty string)"
+$array=ConvertTo-Array $input
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+$input="One"
+write-host "Input is [$input]"
+$array=ConvertTo-Array $input
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+$input=@()
+write-host "Input is [$input]"
+$array=ConvertTo-Array $input
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+$input=@("ArrayItem1")
+write-host "Input is [$input]"
+$array=ConvertTo-Array $input
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+$input=@("ArrayItem1","ArrayItem2")
+write-host "Input is [$input]"
+$array=ConvertTo-Array $input
+write-host " Array count $($array.Count)"
+foreach($item in $array)
+{
+   write-host "  ForEach loop [$item]"
+} 
+
+write-host "---------------------------"
 
 
 

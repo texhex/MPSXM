@@ -1,8 +1,8 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.21.0
+# Version 3.21.1
 # https://github.com/texhex/MPSXM
 #
-# Copyright © 2010-2016 Michael 'Tex' Hex 
+# Copyright © 2010-2017 Michael 'Tex' Hex 
 # Licensed under the Apache License, Version 2.0. 
 #
 # Import this module like this in case it is locatd in the same folder as your script
@@ -1024,7 +1024,8 @@ function Get-QuickReference()
 {
 <#
   .SYNOPSIS
-  Returns a quick reference about the given function or all functions in the module (if you are on GitHub, this text was generated with it).
+  Returns a quick reference about the given function or all functions in the module. The text returned includes function name, call syntax and parameters extracted from the function itself. 
+  If you are on GitHub: the entire reference page was generated with it.
 
   .PARAMETER Name
   Name of the function or the module to generate a quick reference
@@ -1507,7 +1508,7 @@ function ConvertTo-DateTimeString()
 {
 <#
   .SYNOPSIS
-  Converts a DateTime to a string as definied by ISO 8601. The result will be [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
+  Converts a DateTime to a string as definied by ISO 8601. The result will be in the format [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
 
   .PARAMETER DateTime
   The DateTime to be converted to a string
@@ -2204,7 +2205,7 @@ function ConvertTo-Array()
 {
 <#
   .SYNOPSIS
-  Convert a single value or a list of objects to an array so a foreach() call works always 
+  Convert a single value or a list of objects to an array; this way array.Count or a foreach() loop always works. An input of $null will result in a array with count 0.
 
   .PARAMETER InputObject
   A single object, a list of objects or $null
