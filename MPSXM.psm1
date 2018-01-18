@@ -2,7 +2,7 @@
 # Version 3.21.1
 # https://github.com/texhex/MPSXM
 #
-# Copyright © 2010-2017 Michael 'Tex' Hex 
+# Copyright © 2010-2018 Michael 'Tex' Hex 
 # Licensed under the Apache License, Version 2.0. 
 #
 # Import this module like this in case it is locatd in the same folder as your script
@@ -649,7 +649,7 @@ function Start-TranscriptTaskSequence()
  }}function Show-MessageBox {
 <#
   .SYNOPSIS
-  Shows the message box to the user using a message box.
+  Shows the message to the user using a message box.
 
   .PARAMETER Message
   The message to be displayed inside the message box.
