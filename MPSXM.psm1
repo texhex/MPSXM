@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.21.1
+# Version 3.21.2
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -178,7 +178,9 @@ param (
 
   } #switch
    
-}
+}
+
+
 function Get-StringIsNullOrWhiteSpace()
 {
 <#
@@ -450,13 +452,25 @@ param(
 } 
 
 
-Function Get-ComputerLastBootupTime(){<#
+Function Get-ComputerLastBootupTime()
+{
+<#
   .SYNOPSIS
   Returns the date and time of the last bootup time of this computer.
 
   .OUTPUTS
   DateTime (Kind = Local) that is the last bootup time of this computer
-#>    [OutputType([datetime])] #param(#) $obj = Get-CIMInstance Win32_OperatingSystem -Property "LastBootupTime"  return $obj.LastBootUpTime}Function Get-RunningInISE()
+#>    
+[OutputType([datetime])] 
+#param(
+#)
+
+ $obj = Get-CIMInstance Win32_OperatingSystem -Property "LastBootupTime" 
+ return $obj.LastBootUpTime
+}
+
+
+Function Get-RunningInISE()
 {
 <#
   .SYNOPSIS
@@ -464,14 +478,17 @@ Function Get-ComputerLastBootupTime(){<#
 
   .OUTPUTS
   $TRUE if running in ISE, FALSE otherise
-#>    [OutputType([bool])]    
+#>    
+[OutputType([bool])]    
 param()    
     
  return Test-IsISE
 }
 
 
-#From: http://stackoverflow.com/a/25224840#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)Function Test-IsISE()
+#From: http://stackoverflow.com/a/25224840
+#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)
+Function Test-IsISE()
 {
 <#
   .SYNOPSIS
@@ -479,7 +496,8 @@ param()
 
   .OUTPUTS
   $TRUE if running in ISE, FALSE otherise
-#>    [OutputType([bool])]    
+#>    
+[OutputType([bool])]    
 param()    
     
  try 
@@ -505,10 +523,13 @@ function Start-TranscriptTaskSequence()
 
   .OUTPUTS
   None
-#>    param(
+#>    
+param(
  [Parameter(Mandatory=$False)]
  [switch]$NewLog=$False
-) try
+)
+
+ try
  {
    $tsenv = New-Object -COMObject Microsoft.SMS.TSEnvironment
    $logPath = $tsenv.Value("LogPath")
@@ -524,7 +545,17 @@ function Start-TranscriptTaskSequence()
  
  if ( $NewLog ) 
  {
-    Start-TranscriptIfSupported -Path $logPath -Name $logName -NewLog  } else {    Start-TranscriptIfSupported -Path $logPath -Name $logName }}function Start-TranscriptIfSupported {
+    Start-TranscriptIfSupported -Path $logPath -Name $logName -NewLog 
+ }
+ else
+ {
+    Start-TranscriptIfSupported -Path $logPath -Name $logName
+ }
+
+}
+
+
+function Start-TranscriptIfSupported {
 <#
   .SYNOPSIS
   Starts a transscript, but ignores if the host does not support it.
@@ -540,7 +571,8 @@ function Start-TranscriptTaskSequence()
 
   .OUTPUTS
   None
-#>     param(
+#>    
+ param(
   [Parameter(Mandatory=$False,Position=1)]
   [string]$Path=$env:TEMP,
 
@@ -549,7 +581,8 @@ function Start-TranscriptTaskSequence()
   
   [Parameter(Mandatory=$False)]
   [switch]$NewLog=$False
- )
+ )
+
  if ( Test-String -IsNullOrWhiteSpace $Name )
  {
   $Name=Split-Path -Path $myInvocation.ScriptName -Leaf   
@@ -632,21 +665,31 @@ function Start-TranscriptTaskSequence()
  catch [System.Management.Automation.PSNotSupportedException] {
     # The current PowerShell Host doesn't support transcribing
     write-host "Start-TranscriptIfSupported: The current PowerShell host doesn't support transcribing; no log will be generated to [$logfile]"
- }}function Stop-TranscriptIfSupported {
+ }
+}
+
+
+function Stop-TranscriptIfSupported {
 <#
   .SYNOPSIS
   Stops a transscript, but ignores if the host does not support it.
 
   .OUTPUTS
   None
-#>     try 
+#>    
+
+ try 
  {
    Stop-Transcript
  }
  catch [System.Management.Automation.PSNotSupportedException] 
  {
    write-host "Stop-TranscriptIfSupported WARNING: The current PowerShell host doesn't support transcribing. No log was generated."
- }}function Show-MessageBox {
+ }
+}
+
+
+function Show-MessageBox {
 <#
   .SYNOPSIS
   Shows the message to the user using a message box.
