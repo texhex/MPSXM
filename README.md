@@ -17,8 +17,6 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 <!---------------------------------- START HERE ---------------------------------->
 
 
-
-
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
 ```powershell
@@ -257,6 +255,18 @@ Read-StringHashtable [-File] <String>
 ```
  - *File* - The file to read the hashtable from
 
+### Select-StringUnicodeCategory ###
+Selects (filters) characters based on their unicode category from the given string. [Select-StringUnicodeCategory "A B C 123" -IncludeLetter] would return "ABC"
+```powershell
+Select-StringUnicodeCategory [[-String] <String>] [-IncludeLetter] [-IncludeNumber] [-IncludeSpace] [-IncludePunctuation] [-IncludeSymbol]
+```
+ - *String* - The string the operation should be performed on
+ - *IncludeLetter* - Include letter characters
+ - *IncludeNumber* - Include number characters
+ - *IncludeSpace* - Include the default space character (u0020)
+ - *IncludePunctuation* - Include punctuation characters
+ - *IncludeSymbol* - Include symbol characters
+
 ### Set-RegistryValue ###
 Writes a registry value in the given registry path.
 ```powershell
@@ -268,7 +278,7 @@ Set-RegistryValue [-Path] <String> [-Name <String>] -Value <Object> [-Type {Unkn
  - *Type* - The data type used in the registry (REG_xx). If not specified, the type of the given value will be used to assign DWord, QWord or String.
 
 ### Show-MessageBox ###
-Shows the message box to the user using a message box.
+Shows the message to the user using a message box.
 ```powershell
 Show-MessageBox [-Message] <String> [[-Titel] <String>] [-Critical] [-Huge]
 ```
@@ -340,6 +350,9 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
+
+
+
 
  
  
