@@ -15,29 +15,32 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 Clear-Host
 
-#Copy-FileToDirectory "C:\Temp\Run_Me.txt" -Directory "C:\GNARF"
 
-$null
+$input="ABCDEFabcdef GHIJ .-\_/-. ?=()=? :\ 1234567 -+/* €$¥£¢ 890"
+write-host "Full Teststring: [$input]"
 
-$input=$null
-$testArray=ConvertTo-Array $input
-write-host "Input: [$input] - ConvertTo-Array: (Count $($testArray.Count)): $testArray"
+#Do not select anything. Output is empty
+$output=Select-StringUnicodeCategory $input 
+write-host "Nothing selected: [$output]"
 
-$input=123
-$testArray=ConvertTo-Array $input
-write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
+$output=Select-StringUnicodeCategory $input -IncludeLetter
+write-host "-IncludeLetters: [$output]"
 
-$input=@("")
-$testArray=ConvertTo-Array $input
-write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber
+write-host "-IncludeLetters -IncludeNumber: [$output]"
 
-$input=@("abc")
-$testArray=ConvertTo-Array $input
-write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace: [$output]"
 
-$input=@("abc", "def")
-$testArray=ConvertTo-Array $input
-write-host "Input: [$input] - ConvertTo-Array (Count $($testArray.Count)): $testArray"
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol: [$output]"
+
+
+
+
 
 
 write-host "*** ENDE ***"

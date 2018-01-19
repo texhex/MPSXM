@@ -1,15 +1,22 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.21.2
+# Version 3.22.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
 # Licensed under the Apache License, Version 2.0. 
 #
-# Import this module like this in case it is locatd in the same folder as your script
+# Import this module in case it is located in the same folder as your script:
 # Import-Module "$PSScriptRoot\MPSXM.psm1"
 #
-# In case you edit this file, new functions will not be found by the current PS session. Use -Force in this case.
+# In case you edit this file, new functions will not be found by the current PS session - use -Force in this case:
 # Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
+#
+#
+# Before adding a new function, please see
+# [Approved Verbs for Windows PowerShell Commands] http://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
+#
+# To run a PowerShell script from the command line, use
+# powershell.exe [-NonInteractive] -ExecutionPolicy Bypass -File "C:\Script\DoIt.ps1"
 #
 #
 # Common header for your script:
@@ -32,12 +39,8 @@ $ErrorActionPreference = 'Stop'
 Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 #>
-
-# Before adding a new function, please see
-# [Approved Verbs for Windows PowerShell Commands] http://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
-# 
-# To run a PowerShell script from the command line, use
-# powershell.exe [-NonInteractive] -ExecutionPolicy Bypass -File "C:\Script\DoIt.ps1"
+#
+#
 
 
 #requires -version 4.0
@@ -2293,4 +2296,90 @@ function ConvertTo-Array()
             return $array
         }
     }
+}
+
+#This function is based on the work of Francois-Xavier Cat:
+# http://www.lazywinadmin.com/2015/08/powershell-remove-special-characters.html
+# https://github.com/lazywinadmin/PowerShell/blob/master/TOOL-Remove-StringSpecialCharacter/Remove-StringSpecialCharacter.ps1
+#
+#For a list of categories, see 
+# https://en.wikipedia.org/wiki/Unicode_character_property#General_Category
+#and
+# https://docs.microsoft.com/en-us/dotnet/standard/base-types/character-classes-in-regular-expressions#SupportedUnicodeGeneralCategories
+function Select-StringUnicodeCategory()
+{
+<#
+  .SYNOPSIS
+  Selects (filters) characters based on their unicode category from the given string. [Select-StringUnicodeCategory "A B C 123" -IncludeLetter] would return "ABC"
+
+  .PARAMETER String
+  The string the operation should be performed on
+
+  .PARAMETER IncludeLetter
+  Include letter characters 
+
+  .PARAMETER IncludeNumber
+  Include number characters 
+
+  .PARAMETER IncludeSpace
+  Include the default space character (u0020)
+  
+  .PARAMETER IncludePunctuation
+  Include punctuation characters
+
+  .PARAMETER IncludeSymbol
+  Include symbol characters
+#>  
+[OutputType([string])] 
+ param (
+  [Parameter(Mandatory=$false,Position=1)] #false or we can not pass empty strings
+  [string]$String="",
+
+  [Parameter(Mandatory=$false)]
+  [switch]$IncludeLetter,
+
+  [Parameter(Mandatory=$false)]
+  [switch]$IncludeNumber,
+
+  [Parameter(Mandatory=$false)]
+  [switch]$IncludeSpace,
+
+  [Parameter(Mandatory=$false)]
+  [switch]$IncludePunctuation,
+
+  [Parameter(Mandatory=$false)]
+  [switch]$IncludeSymbol
+ )
+
+ $output=""
+
+ #RegEx description: Everything that is NOT (^) matching the unicode category (\p{}) will be replaced
+ # L (Letter)
+ # Nd (Decimal Numbers)
+ # P (Punctuation) 
+ # S (Symbol)
+ # Zs (Space) => Not used as it also includes other "SPACE" charcaters - \u0020 is the "standard space" (ASCII)
+
+ $regex=""
+
+ if ( $IncludeLetter ) { $regex += "\p{L}" }
+ if ( $IncludeNumber ) { $regex += "\p{Nd}" }
+ if ( $IncludePunctuation ) { $regex += "\p{P}" }
+ if ( $IncludeSymbol ) { $regex += "\p{S}" }
+ 
+ if ( $IncludeSpace )  { $regex += "\u0020" }
+
+ #Check if anything was selected. If not, return an empty string
+ if ( Test-String -HasData $regex )
+ {
+    #Finish the regex
+    $regex = "[^$regex]"
+
+    $output= $String -replace $regex
+ }
+
+ 
+
+   
+ return $output
 }

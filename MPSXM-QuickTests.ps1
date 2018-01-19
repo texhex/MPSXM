@@ -309,10 +309,11 @@ write-host "Running in ISE: $result"
 
 write-host "---------------------------"
 
+##Required admins rights for access to C:\Windows\Temp
 #defaults to C:\Windows\Temp
-Start-TranscriptTaskSequence -NewLog
-write-host "Test text "
-Stop-TranscriptIfSupported
+#Start-TranscriptTaskSequence -NewLog
+#write-host "Test text "
+#Stop-TranscriptIfSupported
 
 write-host "---------------------------"
 
@@ -595,6 +596,32 @@ foreach($item in $array)
 {
    write-host "  ForEach loop [$item]"
 } 
+
+write-host "---------------------------"
+
+write-host "Testing Select-StringUnicodeCategory"
+
+$input="ABCDEFabcdef GHIJ .-\_/-. ?=()=? :\ 1234567 -+/* €$¥£¢ 890"
+write-host "Full Teststring: [$input]"
+
+#Do not select anything. Output is empty
+$output=Select-StringUnicodeCategory $input 
+write-host "Nothing selected: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter
+write-host "-IncludeLetters: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber
+write-host "-IncludeLetters -IncludeNumber: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation: [$output]"
+
+$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol
+write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol: [$output]"
 
 write-host "---------------------------"
 
