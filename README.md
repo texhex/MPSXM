@@ -255,6 +255,13 @@ Read-StringHashtable [-File] <String>
 ```
  - *File* - The file to read the hashtable from
 
+### Remove-FileExact ###
+Deletes a file; no wildcards are accepted, the filename must be exact. Exact also means that an 8+3 alias is not allowed (Filena~1). If the file does not exist, no error is generated.
+```powershell
+Remove-FileExact [[-Filename] <String>]
+```
+ - *Filename* - The full path to the file that should be deleted.
+
 ### Select-StringUnicodeCategory ###
 Selects (filters) characters based on their unicode category from the given string. [Select-StringUnicodeCategory "A B C 123" -IncludeLetter] would return "ABC"
 ```powershell
@@ -350,6 +357,8 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
+
+
 
 
 

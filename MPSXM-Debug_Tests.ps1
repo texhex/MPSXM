@@ -15,29 +15,23 @@ Import-Module "$PSScriptRoot\MPSXM.psm1" -Force
 
 Clear-Host
 
+write-host "---------------------------"
 
-$input="ABCDEFabcdef GHIJ .-\_/-. ?=()=? :\ 1234567 -+/* €$¥£¢ 890"
-write-host "Full Teststring: [$input]"
+$sourceFile="C:\windows\win.ini"
+$fileName=Get-FileName $sourceFile
+$destFolder=Get-TempFolder
 
-#Do not select anything. Output is empty
-$output=Select-StringUnicodeCategory $input 
-write-host "Nothing selected: [$output]"
+write-host "Copy-FileToDirectory -Filename `"$sourceFile`" -Directory `"$destFolder`""
+Copy-FileToDirectory -Filename $sourceFile -Directory $destFolder
 
-$output=Select-StringUnicodeCategory $input -IncludeLetter
-write-host "-IncludeLetters: [$output]"
+$destFileName=Join-Path -Path $destFolder -ChildPath $fileName
 
-$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber
-write-host "-IncludeLetters -IncludeNumber: [$output]"
+write-host "Remove-FileExact -Filename `"$destFileName`""
+Remove-FileExact -Filename $destFileName
 
-$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace
-write-host "-IncludeLetters -IncludeNumber -IncludeSpace: [$output]"
 
-$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation
-write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation: [$output]"
 
-$output=Select-StringUnicodeCategory $input -IncludeLetter -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol
-write-host "-IncludeLetters -IncludeNumber -IncludeSpace -IncludePunctuation -IncludeSymbol: [$output]"
-
+write-host "---------------------------"
 
 
 

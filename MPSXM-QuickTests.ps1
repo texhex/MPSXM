@@ -536,10 +536,21 @@ write-host "Test-DirectoryExists `"$testpath`": $result"
 write-host "---------------------------"
 
 $sourceFile="C:\windows\win.ini"
-$destFolder=$env:TEMP
+$destFolder=Get-TempFolder
 
 write-host "Copy-FileToDirectory -Filename `"$sourceFile`" -Directory `"$destFolder`""
 Copy-FileToDirectory -Filename $sourceFile -Directory $destFolder
+
+write-host "---------------------------"
+
+write-host "Testing Remove-FileExact()"
+
+$fileName=Get-FileName $sourceFile
+$destFileName=Join-Path -Path $destFolder -ChildPath $fileName
+
+write-host "Remove-FileExact -Filename `"$destFileName`""
+Remove-FileExact -Filename $destFileName
+
 write-host "---------------------------"
 
 write-host "Testing ConvertTo-Array()"

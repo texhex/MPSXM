@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.22.0
+# Version 3.23.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -59,7 +59,7 @@ $ErrorActionPreference = 'Stop'
 # Get-RunningInISE() should be deleted (replaced with Test-InISE)
 # Add-RegistryValue() should be be deleted (replaced with Set-RegistryValue)
 
-function Get-CurrentProcessBitness()
+Function Get-CurrentProcessBitness()
 {
 <#
   .SYNOPSIS
@@ -135,7 +135,7 @@ param (
 }
 
 
-function Get-OperatingSystemBitness()
+Function Get-OperatingSystemBitness()
 {
 <#
   .SYNOPSIS
@@ -184,7 +184,7 @@ param (
 }
 
 
-function Get-StringIsNullOrWhiteSpace()
+Function Get-StringIsNullOrWhiteSpace()
 {
 <#
   .SYNOPSIS
@@ -207,7 +207,7 @@ param (
 }
 
 
-function Get-StringHasData()
+Function Get-StringHasData()
 {
 <#
   .SYNOPSIS
@@ -230,6 +230,7 @@ param (
 }
 
 
+Function Test-String()
 <#
  -IsNullOrWhiteSpace:
    Helper function for [string]::IsNullOrWhiteSpace - http://msdn.microsoft.com/en-us/library/system.string.isnullorwhitespace%28v=vs.110%29.aspx
@@ -250,7 +251,6 @@ param (
  -StartsWith
    Uses string.StartsWith() with different parameters
 #> 
-function Test-String()
 {
 <#
   .SYNOPSIS
@@ -343,7 +343,7 @@ param (
         #$index=$String.IndexOf($SearchFor, ([System.StringComparer]::OrdinalIgnoreCase))
         #$index=$String.IndexOf($SearchFor, "System.StringComparison.OrdinalIgnoreCase")       
         
-        #We could also use [StringComparison]::CurrentCultureIgnoreCase but it seems OrdinalIgnoreCase is better (Faster)
+        #We could also use [StringComparison]::CurrentCultureIgnoreCase but it seems OrdinalIgnoreCase does the job also
         $result=( $String.IndexOf($SearchFor,[StringComparison]::OrdinalIgnoreCase) ) -ge 0
       }
     }
@@ -367,9 +367,9 @@ param (
 }
 
 
+Function Get-TempFolder() 
 #Yes, I'm aware of $env:TEMP but this will always return a 8+3 path, e.g. C:\USERS\ADMIN~1\AppData..."
 #This function returns the real path without that "~" garbage
-function Get-TempFolder() 
 {
 <#
   .SYNOPSIS
@@ -389,7 +389,8 @@ function Get-TempFolder()
 }
 
 
-Function Get-ModuleAvailable {
+Function Get-ModuleAvailable()
+{
 <#
   .SYNOPSIS
   Returns true if the module exist; it uses a a method that is about 10 times faster then using Get-Module -ListAvailable
@@ -489,9 +490,9 @@ param()
 }
 
 
+Function Test-IsISE()
 #From: http://stackoverflow.com/a/25224840
 #      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)
-Function Test-IsISE()
 {
 <#
   .SYNOPSIS
@@ -515,7 +516,7 @@ param()
 }
 
 
-function Start-TranscriptTaskSequence()
+Function Start-TranscriptTaskSequence()
 {
 <#
   .SYNOPSIS
@@ -558,7 +559,8 @@ param(
 }
 
 
-function Start-TranscriptIfSupported {
+Function Start-TranscriptIfSupported()
+{
 <#
   .SYNOPSIS
   Starts a transscript, but ignores if the host does not support it.
@@ -672,7 +674,8 @@ function Start-TranscriptIfSupported {
 }
 
 
-function Stop-TranscriptIfSupported {
+Function Stop-TranscriptIfSupported()
+{
 <#
   .SYNOPSIS
   Stops a transscript, but ignores if the host does not support it.
@@ -692,7 +695,8 @@ function Stop-TranscriptIfSupported {
 }
 
 
-function Show-MessageBox {
+Function Show-MessageBox() 
+{
 <#
   .SYNOPSIS
   Shows the message to the user using a message box.
@@ -753,9 +757,10 @@ param(
 }
 
 
+Function Get-RandomString()
 #From http://stackingcode.com/blog/2011/10/27/quick-random-string
 # by Adam Boddington
-function Get-RandomString { 
+{ 
 <#
   .SYNOPSIS
   Returns a random string (only Aa-Zz and 0-9 are used).
@@ -783,6 +788,8 @@ param (
 }
 
 
+
+Function Read-StringHashtable() 
 <#
  This is most basic way I could think of to represent a hash table with single string values as a file 
 
@@ -795,7 +802,7 @@ param (
  Key2==Value2
  ...
 #>
-function Read-StringHashtable() {
+{
 <#
   .SYNOPSIS
   Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
@@ -870,14 +877,15 @@ param(
 }
 
 
+Function ConvertTo-HumanizedBytesString()
 #The verb "Humanize" is taken from this great project: [Humanizer](https://github.com/MehdiK/Humanizer)
 #Idea from [Which Disk is that volume on](http://www.uvm.edu/~gcd/2013/01/which-disk-is-that-volume-on/) by Geoff Duke 
-function ConvertTo-HumanizedBytesString {
+{
 <#
   .SYNOPSIS
   Returns a string optimized for readability.
 
-   .PARAMETER bytes
+  .PARAMETER bytes
   The value of bytes that should be returned as humanized string.
 
   .OUTPUTS
@@ -904,7 +912,7 @@ param (
 }
 
 
-function ConvertTo-Version()
+Function ConvertTo-Version()
 {
 <#
   .SYNOPSIS
@@ -943,7 +951,7 @@ param(
    if ( $RespectLeadingZeros) {
       #Reminder: Version object defines Major.Minor.Build.Revision      
 
-      #In case the version only contains of a major version, there is nothing to respect.
+      #In case the version only contains a major version, there is nothing to take care of.
       #Whoever wants to have leading zeros for a major version respected should be killed. 
       if ( $version.Minor -gt -1 ) 
       {
@@ -1018,7 +1026,8 @@ param(
 } 
 
 
-function Exit-Context {
+Function Exit-Context()
+{
 <#
   .SYNOPSIS
   Will exit from the current context and sets an exit code. Nothing will be done when running in ISE.
@@ -1066,7 +1075,7 @@ param(
 } 
 
 
-function Get-QuickReference()
+Function Get-QuickReference()
 {
 <#
   .SYNOPSIS
@@ -1334,7 +1343,7 @@ param (
 }
 
 
-function New-Dictionary()
+Function New-Dictionary()
 {
 <#
   .SYNOPSIS
@@ -1401,7 +1410,7 @@ param (
 }
 
 
-function New-Exception()
+Function New-Exception()
 {
 <#
   .SYNOPSIS
@@ -1532,7 +1541,7 @@ param (
 }
 
 
-function Test-Admin ()
+Function Test-Admin()
 {
 <#
    .SYNOPSIS
@@ -1549,6 +1558,7 @@ function Test-Admin ()
     $principal = New-Object System.Security.Principal.WindowsPrincipal( $identity )
     return $principal.IsInRole( [System.Security.Principal.WindowsBuiltInRole]::Administrator )
 }
+
 
 function ConvertTo-DateTimeString()
 {
@@ -1636,7 +1646,7 @@ param (
 }
 
 
-function ConvertFrom-DateTimeString()
+Function ConvertFrom-DateTimeString()
 {
 <#
   .SYNOPSIS
@@ -1686,7 +1696,7 @@ param (
 }
 
 
-function ConvertTo-UTC()
+Function ConvertTo-UTC()
 {
 <#
   .SYNOPSIS
@@ -1740,7 +1750,7 @@ param (
 }
 
 
-function ConvertFrom-UTC()
+Function ConvertFrom-UTC()
 {
 <#
   .SYNOPSIS
@@ -1769,7 +1779,7 @@ param (
 }
 
 
-function Get-TrimmedString
+Function Get-TrimmedString()
 {
 <#
   .SYNOPSIS
@@ -1890,7 +1900,8 @@ param (
 } #function 
 
 
-function Add-RegistryValue {
+Function Add-RegistryValue()
+{
 <#
   .SYNOPSIS
   Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
@@ -1936,7 +1947,7 @@ param(
 }
 
 
-function Set-RegistryValue
+Function Set-RegistryValue()
 {
 <#
   .SYNOPSIS
@@ -2022,7 +2033,7 @@ param(
 
 
 
-function Get-RegistryValue
+Function Get-RegistryValue()
 {
 <#
   .SYNOPSIS
@@ -2100,7 +2111,7 @@ param(
 }
 
 
-function Get-FileName()
+Function Get-FileName()
 {
 <#
   .SYNOPSIS
@@ -2135,7 +2146,7 @@ function Get-FileName()
 }
 
 
-function Get-ContainingDirectory()
+Function Get-ContainingDirectory()
 {
 <#
   .SYNOPSIS
@@ -2167,7 +2178,7 @@ function Get-ContainingDirectory()
 }
 
 
-function Test-DirectoryExists()
+Function Test-DirectoryExists()
 {
 <#
   .SYNOPSIS
@@ -2188,7 +2199,8 @@ function Test-DirectoryExists()
   return Test-Path -Path $Path -PathType Container
 }
 
-function Test-FileExists()
+
+Function Test-FileExists()
 {
 <#
   .SYNOPSIS
@@ -2209,7 +2221,8 @@ function Test-FileExists()
   return Test-Path -Path $Path -PathType Leaf
 }
 
-function Copy-FileToDirectory()
+
+Function Copy-FileToDirectory()
 {
 <#
   .SYNOPSIS
@@ -2247,7 +2260,7 @@ function Copy-FileToDirectory()
 }
 
 
-function ConvertTo-Array()
+Function ConvertTo-Array()
 {
 <#
   .SYNOPSIS
@@ -2298,6 +2311,8 @@ function ConvertTo-Array()
     }
 }
 
+
+Function Select-StringUnicodeCategory()
 #This function is based on the work of Francois-Xavier Cat:
 # http://www.lazywinadmin.com/2015/08/powershell-remove-special-characters.html
 # https://github.com/lazywinadmin/PowerShell/blob/master/TOOL-Remove-StringSpecialCharacter/Remove-StringSpecialCharacter.ps1
@@ -2306,7 +2321,6 @@ function ConvertTo-Array()
 # https://en.wikipedia.org/wiki/Unicode_character_property#General_Category
 #and
 # https://docs.microsoft.com/en-us/dotnet/standard/base-types/character-classes-in-regular-expressions#SupportedUnicodeGeneralCategories
-function Select-StringUnicodeCategory()
 {
 <#
   .SYNOPSIS
@@ -2378,8 +2392,40 @@ function Select-StringUnicodeCategory()
     $output= $String -replace $regex
  }
 
- 
-
    
  return $output
 }
+
+
+Function Remove-FileExact()
+#HINT: As we use -LiteralPath this function will NOT process wildcards like * or ?
+{
+  <#
+  .SYNOPSIS
+  Deletes a file; no wildcards are accepted, the filename must be exact. Exact also means that an 8+3 alias is not allowed (Filena~1). If the file does not exist, no error is generated. 
+
+  .PARAMETER Filename
+  The full path to the file that should be deleted.
+#> 
+ param(
+  [Parameter(Mandatory=$False)] #$False to allow empty strings
+  [string]$Filename
+)
+
+ if ( Test-String $Filename -HasData )
+ {
+   if ( (Test-FileExists $Filename) ) 
+   {
+     try 
+     {
+        #When using just -Path, sometimes this fails - See http://stackoverflow.com/questions/11586310/having-issue-removing-a-file-in-powershell
+   	    Remove-Item -LiteralPath $Filename -Force -ErrorAction Stop
+     }
+     catch
+     {
+        write-error "Unable to delete [$Filename]: $($_.Exception.Message)"
+     }
+   }
+ } 
+}
+
