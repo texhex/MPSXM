@@ -18,6 +18,27 @@
 # To run a PowerShell script from the command line, use
 # powershell.exe [-NonInteractive] -ExecutionPolicy Bypass -File "C:\Script\DoIt.ps1"
 #
+# 
+# Useful PowerShell data types:
+#
+# #Array:
+# $array = @()
+#
+# #Array with init:
+# $array2= @(1,2,4,8,16)
+#
+# #Arrays are fixed size, so += something will create a new array. Use ArrayList if you plan to dynamically change it
+# $arrayList = new-object System.Collections.ArrayList
+#
+# #Hashtable (Key/Value pairs)
+# $hashtable = @{}
+#
+# #Hashtable with init
+# $hashtable2 = @{ Key1 = "Value 1"; Key2 = "Value2"; }
+#
+# #Ordered dictionary - works the same as hashtable but the order of the keys can be defined 
+# $dictionary = [Ordered]@{ Key1 = "Value 1"; Key2 = "Value2"; }
+#
 #
 # Common header for your script:
 <#
