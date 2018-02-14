@@ -23,14 +23,13 @@ Clear-Host
 
 #Document all in MPSXM by using a function from MPSXM :)
 Get-QuickReference -Module "MPSXM" -Output CommonMark 
-
 #-SortByNoun
 
 #simple tests
-#Get-QuickReference "Get-TrimmedString"
+#Get-QuickReference "Remove-FileExact"
+#Get-QuickReference "Get-StringHash"
 #Get-QuickReference "ConvertTo-DateTimeString"
 #Get-QuickReference "Add-RegistryValue" 
-
 #Get-QuickReference "Add-RegistryValue" -Output "CommonMark"
 
 #$QuickRef=Get-QuickReference "Show-MessageBox" -Output Objects

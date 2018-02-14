@@ -17,6 +17,7 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 <!---------------------------------- START HERE ---------------------------------->
 
 
+
 ### Add-RegistryValue ###
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
 ```powershell
@@ -188,6 +189,14 @@ Get-StringHasData [-string] <String>
 ```
  - *string* - The string value to be checked
 
+### Get-StringHash ###
+Returns the hash value of the given string using the given algorithm
+```powershell
+Get-StringHash [[-string] <String>] [-HashName] <String>
+```
+ - *string* - The string to be hashed
+ - *HashName* - The hash algorithm to be used. Defaults to SHA1
+
 ### Get-StringIsNullOrWhiteSpace ###
 Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
 ```powershell
@@ -336,6 +345,13 @@ Test-FileExists [-Path] <String>
 ```
  - *Path* - The string path of the fiel , e.g. C:\Temp\MyFile.txt"
 
+### Test-IsHashtable ###
+Returns if the parameter is a hash table or an ordered dictionary (which behave the same as hash tables )
+```powershell
+Test-IsHashtable [-InputObject] <Object>
+```
+ - *InputObject* - An object that is checked if it's a hash table
+
 ### Test-IsISE ###
 Returns if the current script is executed by Windows PowerShell ISE
 ```powershell
@@ -357,8 +373,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
-
 
 
 
