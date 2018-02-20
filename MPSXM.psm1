@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.24.0
+# Version 3.24.1
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -1842,8 +1842,7 @@ Function Get-TrimmedString()
   Removes all leading and trailing white-space characters, then replace any character considered to be a white-space with the standard white-space character (U+0020)
 
   .PARAMETER RemoveDuplicates
-  Removes all leading and trailing white-space characters, then replace any white-space duplicates with 
-  one white-space (U+0020)
+  Removes all leading and trailing white-space characters, then replace any white-space duplicates with one white-space (U+0020); any non-standard white-space characters will also be replaced.
 
 
   .OUTPUTS
@@ -1903,11 +1902,41 @@ Function Get-TrimmedString()
             {
                 if ( [Char]::IsWhiteSpace($char) )
                 {
-                    $sb.Append(" ") | Out-Null #ignore output from StringBuilder            
+                    [void]$sb.Append(" ") 
                 }
                 else
                 {
-                    $sb.Append($char) | Out-Null  
+                    [void]$sb.Append($char)
+                }
+            }
+        
+            return $sb.ToString()
+        }
+
+        "RemoveDuplicates"
+        {        
+            #Trim() uses internally the function Char.IsWhiteSpace so we should do the same
+            $sb = New-Object System.Text.StringBuilder
+
+            $lastCharWasWhiteSpace = $false
+        
+            $chars = $String.Trim().ToCharArray()            
+            foreach ($char in $chars)
+            {
+                if ( [Char]::IsWhiteSpace($char) )
+                {
+                    if ( -not $lastCharWasWhiteSpace )
+                    {
+                        [void]$sb.Append(" ") 
+                    }
+
+                    $lastCharWasWhiteSpace = $true
+                }
+                else
+                {
+                    [void]$sb.Append($char)
+                    
+                    $lastCharWasWhiteSpace = $false
                 }
             }
         
@@ -1921,18 +1950,6 @@ Function Get-TrimmedString()
         
             #Now we can easily search for space and eliminate it
             return $innerstring.Replace(" ", "")
-        }
-
-        "RemoveDuplicates"
-        {        
-            $str = Get-TrimmedString $String -Equalize
-
-            while ( (Test-String $str -Contains "  ") )
-            {
-                $str = $str.Replace("  ", " ")
-            }
-
-            return $str
         }
 
     } #switch
@@ -2477,25 +2494,22 @@ Function Remove-FileExact()
 # http://jongurgul.com/blog/get-stringhash-get-filehash/
 Function Get-StringHash()
 {
-    <#
-.SYNOPSIS
-Returns the hash value of the given string using the given algorithm
-
-.PARAMETER string
-The string to be hashed
-
-.PARAMETER HashName
-The hash algorithm to be used. Defaults to SHA1
-
-.OUTPUTS
-string
-#>    
-
+    #.SYNOPSIS
+    #Returns the hash value of the given string using the given algorithm
+    #
+    #.PARAMETER String
+    #The string to be hashed
+    #
+    #.PARAMETER HashName
+    #The hash algorithm to be used. Defaults to SHA1
+    #
+    #.OUTPUTS
+    #string
     [OutputType([string])] 
     param (
         [Parameter(Mandatory = $False, Position = 1)]
         [AllowEmptyString()] #we need this or PowerShell will complain "Cannot bind argument to parameter 'string' because it is an empty string." 
-        [string]$string,
+        [string]$String,
 
         [Parameter(Mandatory = $True, Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -2514,16 +2528,16 @@ string
 
 Function Test-IsHashtable()
 {
-    <#
-  .SYNOPSIS
-  Returns if the parameter is a hash table or an ordered dictionary (which behave the same as hash tables )
 
-  .PARAMETER InputObject
-  An object that is checked if it's a hash table
+    #.SYNOPSIS
+    #Returns if the parameter is a hash table or an ordered dictionary (which behave the same as hash tables )
+    #
+    #.PARAMETER InputObject
+    #An object that is checked if it's a hash table
+    #
+    #.OUTPUTS
+    #bool
 
-  .OUTPUTS
-  bool
-#>
     [OutputType([bool])] 
     param (
         [Parameter(Mandatory = $True, Position = 1)]
