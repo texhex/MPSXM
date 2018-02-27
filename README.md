@@ -36,6 +36,15 @@ ConvertFrom-DateTimeString [-DateTimeString] <String>
 ```
  - *DateTimeString* - The string to be converted to a DateTime
 
+### ConvertFrom-JsonToHashtable ###
+Converts a string or contents of a file from JSON format to a hash table
+```powershell
+ConvertFrom-JsonToHashtable [-String] <String>
+ConvertFrom-JsonToHashtable -File <String>
+```
+ - *String* - A string in JSON format that should be converted to a hash table
+ - *File* - A file path to a file that stores JSON data and that will be returned as hash table
+
 ### ConvertFrom-UTC ###
 Converts a given Coordinated Universal Time (UTC) DateTime to local time.
 ```powershell
@@ -192,9 +201,9 @@ Get-StringHasData [-string] <String>
 ### Get-StringHash ###
 Returns the hash value of the given string using the given algorithm
 ```powershell
-Get-StringHash [[-string] <String>] [-HashName] <String>
+Get-StringHash [[-String] <String>] [-HashName] <String>
 ```
- - *string* - The string to be hashed
+ - *String* - The string to be hashed
  - *HashName* - The hash algorithm to be used. Defaults to SHA1
 
 ### Get-StringIsNullOrWhiteSpace ###
@@ -224,8 +233,8 @@ Get-TrimmedString [[-String] <String>] -RemoveAll
  - *StartOnly* - Only remove leading white-space chracters
  - *EndOnly* - Only remove trailing white-space chracters
  - *Equalize* - Removes all leading and trailing white-space characters, then replace any character considered to be a white-space with the standard white-space character (U+0020)
- - *RemoveDuplicates* - Removes all leading and trailing white-space characters, then replace any white-space duplicates with 
-one white-space (U+0020)
+ - *RemoveDuplicates* - Removes all leading and trailing white-space characters, then replace any white-space duplicates with one white-space (U+0020); any non-standard white-space characters will also be r
+eplaced.
  - *RemoveAll* - Removes all white-space chracters from the string
 
 ### New-Dictionary ###
@@ -373,8 +382,6 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
  - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
  - *SearchFor* - The string beeing sought
  - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
-
 
 
  

@@ -17,24 +17,70 @@ Clear-Host
 
 write-host "---------------------------"
 
-$sourceFile="C:\windows\win.ini"
-$fileName=Get-FileName $sourceFile
-$destFolder=Get-TempFolder
-
-write-host "Copy-FileToDirectory -Filename `"$sourceFile`" -Directory `"$destFolder`""
-Copy-FileToDirectory -Filename $sourceFile -Directory $destFolder
-
-$destFileName=Join-Path -Path $destFolder -ChildPath $fileName
-
-write-host "Remove-FileExact -Filename `"$destFileName`""
-Remove-FileExact -Filename $destFileName
+$testJSon = @"
+{
+"Objectname": "[computer].[WIFIAdapter]",
+"ConnectionString": "",
+"Commands": [
+    {
+        "SQLTemplate": "DELETE FROM @@OBJECT_NAME@@ WHERE @@COLUMN@@=@@PARAMETER@@;",
+        "ColumnMap": [
+            {
+                "Column": "CID",
+                "Source": "CID",
+                "Type": "Int"
+            }
+        ],
+        "Data": []
+    },
+    {
+        "SQLTemplate": "INSERT INTO @@OBJECT_NAME@@(@@COLUMN@@) VALUES(@@PARAMETER@@);",
+        "ColumnMap": [
+            {
+                "Column": "CID",
+                "Source": "CID",
+                "Type": "Int"
+            },
+            {
+                "Column": "Name",
+                "Source": "Adapter",
+                "Type": "NVarChar"
+            },
+            {
+                "Column": "MACAddress",
+                "Source": "MACAddress",
+                "Type": "NVarChar"
+            },
+            {
+                "Column": "DriverVendor",
+                "Source": "DriverVendor",
+                "Type": "NVarChar"
+            },                
+            {
+                "Column": "DriverDate",
+                "Source": "DriverDate",
+                "Type": "DateTime2"
+            },
+            {
+                "Column": "DriverVersion",
+                "Source": "DriverVersionText",
+                "Type": "NVarChar"
+            }               
+        ],
+        "Data": []
+    }
+]
+}
+"@
 
 
 
 write-host "---------------------------"
 
+$hashtable = ConvertFrom-JsonToHashtable $testJSon
+$hashtable.GetType()
 
-
+write-host (ConvertTo-Json $hashtable -Depth 10)
 
 
 write-host "*** ENDE ***"

@@ -2568,7 +2568,7 @@ Function Test-IsHashtable()
 Function ConvertFrom-JsonToHashtable()
 {
     #.SYNOPSIS
-    # Converts a given string from JSON format to a hash table
+    # Converts a string or contents of a file from JSON format to a hash table
     #
     #.PARAMETER String
     # A string in JSON format that should be converted to a hash table
