@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.24.1
+# Version 3.25.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -82,22 +82,22 @@ $ErrorActionPreference = 'Stop'
 
 Function Get-CurrentProcessBitness()
 {
-    <#
-  .SYNOPSIS
-  Returns information about the current powershell process.
+    
+    #.SYNOPSIS
+    #Returns information about the current powershell process.
+    #
+    #.PARAMETER Is64bit
+    #Returns $True if the current script is running as 64-bit process.
+    #
+    #.PARAMETER Is32bit
+    #Returns $True if the current script is running as 32-bit process.
+    #
+    #.PARAMETER IsWoW
+    #Returns $True if the current script is running as 32-bit process on a 64-bit machine (Windows on Windows).
+    #
+    #.OUTPUTS
+    #Boolean, depending on parameter
 
-  .PARAMETER Is64bit
-  Returns $True if the current script is running as 64-bit process.
-
-  .PARAMETER Is32bit
-  Returns $True if the current script is running as 32-bit process.
-
-  .PARAMETER IsWoW
-  Returns $True if the current script is running as 32-bit process on a 64-bit machine (Windows on Windows).
-
-  .OUTPUTS
-  Boolean, depending on parameter
-#>
     [OutputType([bool])] 
     param (
         [Parameter(ParameterSetName = "32bit", Mandatory = $True)]
@@ -158,19 +158,19 @@ Function Get-CurrentProcessBitness()
 
 Function Get-OperatingSystemBitness()
 {
-    <#
-  .SYNOPSIS
-  Returns information about the current operating system
+    
+    #.SYNOPSIS
+    #Returns information about the current operating system
+    #
+    #.PARAMETER Is64bit
+    #Returns $True if the current operating system is 64-bit
+    #
+    #.PARAMETER Is32bit
+    #Returns $True if the current operating system is 32-bit 
+    #
+    #.OUTPUTS
+    #Boolean, depending on parameter
 
-  .PARAMETER Is64bit
-  Returns $True if the current operating system is 64-bit
-
-  .PARAMETER Is32bit
-  Returns $True if the current operating system is 32-bit 
-
-  .OUTPUTS
-  Boolean, depending on parameter
-#>
     [OutputType([bool])] 
     param (
         [Parameter(ParameterSetName = "32bit", Mandatory = $True)]
@@ -207,16 +207,16 @@ Function Get-OperatingSystemBitness()
 
 Function Get-StringIsNullOrWhiteSpace()
 {
-    <#
-  .SYNOPSIS
-  Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
+   
+    #.SYNOPSIS
+    #Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
+    #
+    #.PARAMETER String
+    #The string value to be checked
+    #
+    #.OUTPUTS
+    #$true if the string is either $null, empty, or consists only of white-space characters, $false otherwise
 
-  .PARAMETER String
-  The string value to be checked
-
-  .OUTPUTS
-  $true if the string is either $null, empty, or consists only of white-space characters, $false otherwise
-#>
     [OutputType([bool])] 
     param (
         [Parameter(Mandatory = $True, Position = 1)]
@@ -230,16 +230,16 @@ Function Get-StringIsNullOrWhiteSpace()
 
 Function Get-StringHasData()
 {
-    <#
-  .SYNOPSIS
-  Returns true if the string contains data (does not contain $null, empty or only white spaces). Uses [Test-String -HasData] internally.
+   
+    #.SYNOPSIS
+    #Returns true if the string contains data (does not contain $null, empty or only white spaces). Uses [Test-String -HasData] internally.
+    #
+    #.PARAMETER string
+    #The string value to be checked
+    #
+    #.OUTPUTS
+    #$true if the string is not $null, empty, or consists only of white space characters, $false otherwise
 
-  .PARAMETER string
-  The string value to be checked
-
-  .OUTPUTS
-  $true if the string is not $null, empty, or consists only of white space characters, $false otherwise
-#>
     [OutputType([bool])] 
     param (
         [Parameter(Mandatory = $True, Position = 1)]
@@ -272,35 +272,34 @@ Function Test-String()
  -StartsWith
    Uses string.StartsWith() with different parameters
 #> 
-{
-    <#
-  .SYNOPSIS
-  Tests the given string for a condition 
+{   
+    #.SYNOPSIS
+    #Tests the given string for a condition 
+    #
+    #.PARAMETER String
+    #The string the specified operation should be performed on
+    #
+    #.PARAMETER IsNullOrWhiteSpace
+    #Returns true if the string is either $null, empty, or consists only of white-space characters.
+    #
+    #.PARAMETER HasData
+    #Returns true if the string contains data (not $null, empty or only white spaces)
+    #
+    #.PARAMETER Contains
+    #Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
+    #
+    #.PARAMETER StartsWith
+    #Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
+    #
+    #.PARAMETER SearchFor
+    #The string beeing sought
+    #
+    #.PARAMETER CaseSensitive
+    #Perform an operation that respect letter casing, so [ABC] is different from [aBC]. 
+    #
+    #.OUTPUTS
+    #bool
 
-  .PARAMETER String
-  The string the specified operation should be performed on
-
-  .PARAMETER IsNullOrWhiteSpace
-  Returns true if the string is either $null, empty, or consists only of white-space characters.
-
-  .PARAMETER HasData
-  Returns true if the string contains data (not $null, empty or only white spaces)
-
-  .PARAMETER Contains
-  Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
-
-  .PARAMETER StartsWith
-  Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. 
-  
-  .PARAMETER SearchFor
-  The string beeing sought
-
-  .PARAMETER CaseSensitive
-  Perform an operation that respect letter casing, so [ABC] is different from [aBC]. 
-
-  .OUTPUTS
-  bool
-#>
     [OutputType([bool])]  
     param (
         [Parameter(Mandatory = $false, Position = 1)] #false or we can not pass empty strings
@@ -842,16 +841,16 @@ Function Read-StringHashtable()
  ...
 #>
 {
-    <#
-  .SYNOPSIS
-  Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
+    
+    #.SYNOPSIS
+    #Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
+    #
+    #.PARAMETER File
+    #The file to read the hashtable from
+    #
+    #.OUTPUTS
+    #Hashtable
 
-  .PARAMETER File
-  The file to read the hashtable from
-
-  .OUTPUTS
-  Hashtable
-#>
     [OutputType([Hashtable])]  
     param(
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
@@ -2566,3 +2565,65 @@ Function Test-IsHashtable()
 }
 
 
+Function ConvertFrom-JsonToHashtable()
+{
+    #.SYNOPSIS
+    # Converts a given string from JSON format to a hash table
+    #
+    #.PARAMETER String
+    # A string in JSON format that should be converted to a hash table
+    #
+    #.PARAMETER File
+    # A file path to a file that stores JSON data and that will be returned as hash table
+    #
+    #.OUTPUTS
+    #Hashtable
+
+    [OutputType([Hashtable])]  
+    param(
+        [Parameter(ParameterSetName = "String", Mandatory = $True, Position = 1, ValueFromPipeline = $True)]
+        [string]$String,
+
+        [Parameter(ParameterSetName = "File", Mandatory = $True, ValueFromPipeline = $True)]
+        [string]$File
+    )
+
+    
+    switch ($PsCmdlet.ParameterSetName)
+    { 
+
+        "String"
+        {  
+            if ($PSVersionTable.PSVersion.Major -lt 6)
+            {
+                #This code is from this blog post by Kevin Marquette (https://kevinmarquette.github.io/):
+                #https://kevinmarquette.github.io/2016-11-06-powershell-hashtable-everything-you-wanted-to-know-about/?utm_source=blog&utm_medium=blog&utm_content=popref
+
+                [void][Reflection.Assembly]::LoadWithPartialName("System.Web.Script.Serialization")
+                $JSSerializer = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
+                return [Hashtable] ($JSSerializer.Deserialize($String, 'Hashtable')) 
+            }
+            else
+            {
+                #PowerShell 6.0 and above support -AsHashtable
+                return ConvertFrom-Json -InputObject $String -AsHashtable
+
+            }
+        }
+
+        "File"
+        {
+            if ( Test-Path $File )
+            {  
+                #-Raw can handle UTF-8 files with or without BOM
+                $jsonData = Get-Content $File -Raw
+                
+                return ConvertFrom-JsonToHashtable -String $jsonData
+            }
+            else
+            {
+                throw New-Exception -FileNotFound "The file [$file] does not exist or is not accessible"
+            }
+        }
+    }
+}
