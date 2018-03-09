@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.25.0
+# Version 3.26.1
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -583,6 +583,7 @@ Function Start-TranscriptTaskSequence()
     }
 
     $logName = Split-Path -Path $myInvocation.ScriptName -Leaf   
+    Write-Verbose "Start-TranscriptTaskSequence: Using logfile $($logName)"
  
     if ( $NewLog ) 
     {
@@ -629,6 +630,12 @@ Function Start-TranscriptIfSupported()
     {
         $Name = Split-Path -Path $myInvocation.ScriptName -Leaf   
     }
+
+    if ( -not (Test-DirectoryExists $Path) )
+    {
+        write-error "Logfile path [$Path] does not exist, defaulting to [$($env:TEMP)]" -ErrorAction Continue
+        $Path = $env:TEMP
+    }
  
     $logFileTemplate = "$($Name).log"
     $extension = "txt" #always use lower case chars only!
@@ -643,7 +650,15 @@ Function Start-TranscriptIfSupported()
 
         [uint32]$value = 1
 
-        $existing_files = Get-ChildItem -Path $Path -File -Filter $filter -Force 
+        #If the path does not exist, this line crashes with "A parameter can not be found that maches parameter FILE" which does not make any sense IMHO
+        try
+        {
+            $existing_files = Get-ChildItem -Path $Path -File -Filter $filter -Force -ErrorAction Stop
+        }
+        catch
+        {
+            throw "Unable to list files in path [$Path] with filter [$filter]: $($_.Exception.Message)"            
+        }
    
         #In case we get $null this means that no files were found. Nothing more to 
         if ( $existing_files -ne $null )
@@ -2596,11 +2611,14 @@ Function ConvertFrom-JsonToHashtable()
         {  
             if ($PSVersionTable.PSVersion.Major -lt 6)
             {
-                #This code is from this blog post by Kevin Marquette (https://kevinmarquette.github.io/):
+                #This code is based from this blog post by Kevin Marquette 
                 #https://kevinmarquette.github.io/2016-11-06-powershell-hashtable-everything-you-wanted-to-know-about/?utm_source=blog&utm_medium=blog&utm_content=popref
+                #Added by commands from Mathieu Isabel
+                #https://unhandled.wordpress.com/2016/12/18/powershell-performance-tip-use-javascriptserializer-instead-of-convertto-json/
 
+                Add-Type -AssemblyName System.Web.Extensions
                 [void][Reflection.Assembly]::LoadWithPartialName("System.Web.Script.Serialization")
-                $JSSerializer = [System.Web.Script.Serialization.JavaScriptSerializer]::new()
+                $JSSerializer = New-Object -TypeName System.Web.Script.Serialization.JavaScriptSerializer
                 return [Hashtable] ($JSSerializer.Deserialize($String, 'Hashtable')) 
             }
             else
@@ -2626,4 +2644,41 @@ Function ConvertFrom-JsonToHashtable()
             }
         }
     }
+}
+
+
+#The default enabled security protocols for HTTPS in .NET 4.0/4.5 (and hence PowerShell) are SecurityProtocolType.Tls|SecurityProtocolType.Ssl3
+#These protocols are considered unsecure and many server have disabled them all together. Therefore, WebClient might not be able to communicate with them to HTTPS 
+#This function will enable TLS 1.2 and disable older protocols but in a way that, if PowerShell support TLS 1.3, TLS 1.3 will still be enabled (forward-compatible)
+#
+#For more details:
+#StackOverflow answer by Luke Hutton: https://stackoverflow.com/a/28333370
+#.NET API Browser: https://docs.microsoft.com/en-us/dotnet/api/system.net.servicepointmanager.securityprotocol?view=netframework-4.7#System_Net_ServicePointManager_SecurityProtocol
+
+function Set-HTTPSecurityProtocolSecureDefault()
+{
+    #.SYNOPSIS
+    # Sets the default HTTPS protocol to TLS 1.2 (and any newer protocol) while disabling unsecure protocols (SSL 3.0, TLS 1.0 and TLS 1.1) in a forward-compatible style
+
+    #Activate TLS 1.2
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]'Tls12'
+
+    #Check if SSL 3.0 is enabled and if so, disable it
+    if ( [System.Net.ServicePointManager]::SecurityProtocol -band [System.Net.SecurityProtocolType]'Ssl3' ) 
+    {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bxor [System.Net.SecurityProtocolType]'Ssl3'   
+    }
+
+    #Check if TLS 1.0 is enabled and if so, disable it
+    if ( [System.Net.ServicePointManager]::SecurityProtocol -band [System.Net.SecurityProtocolType]'Tls' ) 
+    {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bxor [System.Net.SecurityProtocolType]'Tls'   
+    }
+
+    #Check if TLS 1.1 is enabled and if so, disable it
+    if ( [System.Net.ServicePointManager]::SecurityProtocol -band [System.Net.SecurityProtocolType]'Tls11' ) 
+    {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bxor [System.Net.SecurityProtocolType]'Tls11'   
+    }
+
 }

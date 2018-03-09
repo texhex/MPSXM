@@ -17,70 +17,25 @@ Clear-Host
 
 write-host "---------------------------"
 
-$testJSon = @"
+#write-host "---------------------------"
+
+
+function TestFunction()
 {
-"Objectname": "[computer].[WIFIAdapter]",
-"ConnectionString": "",
-"Commands": [
-    {
-        "SQLTemplate": "DELETE FROM @@OBJECT_NAME@@ WHERE @@COLUMN@@=@@PARAMETER@@;",
-        "ColumnMap": [
-            {
-                "Column": "CID",
-                "Source": "CID",
-                "Type": "Int"
-            }
-        ],
-        "Data": []
-    },
-    {
-        "SQLTemplate": "INSERT INTO @@OBJECT_NAME@@(@@COLUMN@@) VALUES(@@PARAMETER@@);",
-        "ColumnMap": [
-            {
-                "Column": "CID",
-                "Source": "CID",
-                "Type": "Int"
-            },
-            {
-                "Column": "Name",
-                "Source": "Adapter",
-                "Type": "NVarChar"
-            },
-            {
-                "Column": "MACAddress",
-                "Source": "MACAddress",
-                "Type": "NVarChar"
-            },
-            {
-                "Column": "DriverVendor",
-                "Source": "DriverVendor",
-                "Type": "NVarChar"
-            },                
-            {
-                "Column": "DriverDate",
-                "Source": "DriverDate",
-                "Type": "DateTime2"
-            },
-            {
-                "Column": "DriverVersion",
-                "Source": "DriverVersionText",
-                "Type": "NVarChar"
-            }               
-        ],
-        "Data": []
-    }
-]
+    $logPath = $env:windir + "\temp"
+    $logPath = "X:\WINDOWS\TEMP\SMSTSLog"
+
+    write-host "$logPath"
+    write-host $myInvocation.ScriptName
+    
+    $logName = Split-Path -Path $myInvocation.ScriptName -Leaf   
+    Start-TranscriptIfSupported -Path $logPath -Name $logName -NewLog 
+   
 }
-"@
 
 
+TestFunction
 
-write-host "---------------------------"
-
-$hashtable = ConvertFrom-JsonToHashtable $testJSon
-$hashtable.GetType()
-
-write-host (ConvertTo-Json $hashtable -Depth 10)
-
+Stop-TranscriptIfSupported
 
 write-host "*** ENDE ***"
