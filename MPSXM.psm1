@@ -402,17 +402,16 @@ Function Test-String()
 }
 
 
-Function Get-TempFolder() 
 #Yes, I'm aware of $env:TEMP but this will always return a 8+3 path, e.g. C:\USERS\ADMIN~1\AppData..."
 #This function returns the real path without that "~" garbage
-{
-    <#
-  .SYNOPSIS
-  Returns a path to the temporary folder without any (8+3) paths in it
 
-  .OUTPUTS
-  Path to temporary folder without an ending "\"
-#> 
+Function Get-TempFolder() 
+{   
+    #.SYNOPSIS
+    # Returns a path to the temporary folder without any (8+3) paths in it. The path does not include a "\" at the end. 
+    #
+    #.OUTPUTS
+    # Path to temporary folder without an ending "\"
 
     $temp = [System.IO.Path]::GetTempPath()
     if ( $temp.EndsWith("\") )
