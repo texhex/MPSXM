@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.26.1
+# Version 3.27.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -511,46 +511,6 @@ Function Get-ComputerLastBootupTime()
 }
 
 
-Function Get-RunningInISE()
-{
-    <#
-  .SYNOPSIS
-  Returns if the current script is executed by Windows PowerShell ISE (uses Test-IsISE internally)
-
-  .OUTPUTS
-  $TRUE if running in ISE, FALSE otherise
-#>    
-    [OutputType([bool])]    
-    param()    
-    
-    return Test-IsISE
-}
-
-
-Function Test-IsISE()
-#From: http://stackoverflow.com/a/25224840
-#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)
-{
-    <#
-  .SYNOPSIS
-  Returns if the current script is executed by Windows PowerShell ISE
-
-  .OUTPUTS
-  $TRUE if running in ISE, FALSE otherise
-#>    
-    [OutputType([bool])]    
-    param()    
-    
-    try 
-    {    
-        return $psISE -ne $null
-    }
-    catch 
-    {
-        return $false
-    }
-
-}
 
 
 Function Start-TranscriptTaskSequence()
@@ -2682,3 +2642,79 @@ function Set-HTTPSecurityProtocolSecureDefault()
     }
 
 }
+
+#Changes 3.27
+
+Function Get-RunningInISE()
+{
+    #.SYNOPSIS
+    # Returns if the current script is executed by Windows PowerShell ISE (uses Test-IsISE internally)
+    #
+    #.OUTPUTS
+    # $TRUE if running in ISE, FALSE otherise
+    #  
+    [OutputType([bool])]    
+    param()    
+    
+    return Test-IsISE
+}
+
+
+#From: http://stackoverflow.com/a/25224840
+#      by kuujinbo (http://stackoverflow.com/users/604196/kuujinbo)
+Function Test-IsISE()
+{
+    #.SYNOPSIS
+    # Returns if the current script is executed by Windows PowerShell ISE
+    #
+    #.OUTPUTS
+    # $TRUE if running in ISE, FALSE otherise
+    #  
+    [OutputType([bool])]    
+    param()    
+    
+    try 
+    {    
+        return $psISE -ne $null
+    }
+    catch 
+    {
+        return $false
+    }
+}
+
+Function Test-RunningInEditor()
+{
+    #.SYNOPSIS
+    # Returns TRUE if the current script is executed by a editor (host) like ISE or Visual Studio Code
+    #
+    #.OUTPUTS
+    # $TRUE if running in an editor host, FALSE otherise
+    #  
+    [OutputType([bool])]    
+    param()    
+    
+    $result = $false
+
+    try 
+    {   
+        $host = Get-Host
+
+        if ( 
+            ($host.Name -eq "Windows PowerShell ISE Host") -or
+            ($host.Name -eq "Visual Studio Code Host") 
+        )
+        {
+
+            $result = $true
+        }
+
+    }
+    catch 
+    {
+        $result = $false
+    }
+    
+    return $result
+}
+

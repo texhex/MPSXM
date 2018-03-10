@@ -36,6 +36,9 @@ function TestFunction()
 
 TestFunction
 
+Test-RunningInEditor
+
+
 Stop-TranscriptIfSupported
 
 write-host "*** ENDE ***"
