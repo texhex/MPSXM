@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.28.0
+# Version 3.28.1
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -2748,7 +2748,7 @@ Function Get-PropertyValueSafe()
         $Property = $null,
 
         [Parameter(Mandatory = $False, Position = 3)]
-        [ValidateNotNullOrEmpty()]
+        [ValidateNotNull()]
         $Default = ""
     )
 
