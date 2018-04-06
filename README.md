@@ -17,6 +17,7 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 <!---------------------------------- START HERE ---------------------------------->
 
 
+
 ### Add-RegistryValue ###
 
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
@@ -227,7 +228,7 @@ Get-OperatingSystemBitness -Is64bit
 
 ### Get-PropertyValueSafe ###
 
-Tries to get a property value from the object and returns the replacement value if the property was not found on the object
+Tries to get a property value from the object and returns the replacement value if the property was not found or is null
 
 ```powershell
 Get-PropertyValueSafe [[-InputObject] <Object>] [[-Property] <Object>] [[-Default] <Object>]
@@ -235,7 +236,7 @@ Get-PropertyValueSafe [[-InputObject] <Object>] [[-Property] <Object>] [[-Defaul
 
 - *InputObject* - The object to operate on
 - *Property* - The name of the property to query
-- *Default* - The value that should be used in case the property does not exist
+- *Default* - The value that should be used in case the property does not exist or is null
 
 
 ### Get-QuickReference ###
@@ -581,7 +582,7 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
 - *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
 - *SearchFor* - The string beeing sought
 - *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
-
+ 
  
  
 <!---------------------------------- STOP HERE ---------------------------------->
