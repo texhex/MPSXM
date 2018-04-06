@@ -29,9 +29,9 @@ Get-PropertyValueSafe $testObject -Property "PropX" -Default "X_NoValue"
 Get-PropertyValueSafe $testObject -Property "Prop2" -Default "Prop2_NoValue"
 Get-PropertyValueSafe $testObject -Property $Null -Default "Null_NoValue"
 Get-PropertyValueSafe $null -Property $Null -Default "Null_Null_NoValue"
-
-
-
+Get-PropertyValueSafe $null -Property $Null
+Get-PropertyValueSafe $null
+Get-PropertyValueSafe 
 
 
 
