@@ -2728,7 +2728,7 @@ Function Test-RunningInEditor()
 Function Get-PropertyValueSafe()
 {
     #.SYNOPSIS
-    # Tries to get a property value from the object and returns the replacement value if the property was not found on the object
+    # Tries to get a property value from the object and returns the replacement value if the property was not found or is null
     #
     #.PARAMETER InputObject
     # The object to operate on
@@ -2737,10 +2737,10 @@ Function Get-PropertyValueSafe()
     # The name of the property to query
     #
     #.PARAMETER Default
-    # The value that should be used in case the property does not exist
+    # The value that should be used in case the property does not exist or is null
     #
     #.OUTPUTS
-    # The value of the property or replacement value  
+    # The value of the property or the replacement value  
 
     param (
         [Parameter(Mandatory = $False, Position = 1)]
