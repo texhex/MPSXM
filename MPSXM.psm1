@@ -1301,22 +1301,26 @@ Function Get-QuickReference()
 
             foreach ($qr in $qrList)
             {  
+                $txt += "`n" #start with a new line
                 $txt += "### $($qr.Name) ###`n"
+                $txt += "`n"
                 $txt += "$($qr.Synopsis)`n"
    
                 #Syntax
+                $txt += "`n"
                 $txt += "$CODE_BLOCK_START`n"
                 foreach ($syn in $qr.Syntax)
                 {
                     $txt += "$($syn)`n"
                 }          
                 $txt += "$CODE_BLOCK_END`n"
+                $txt += "`n"
 
                 #Parameters (if any)
                 foreach ($param in $qr.Parameter.GetEnumerator())
                 {
                     #Syntax is: <List> <BOLD>NAME<BOLD> - Description
-                    $txt += " - *$($param.Key)* - $($param.Value)`n"
+                    $txt += "- *$($param.Key)* - $($param.Value)`n"
                 }
           
                 $txt += "`n"
