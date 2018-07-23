@@ -2,7 +2,6 @@
 
 MyName==MyValue
 
-
 #this is also valid, leading or tralling spaces are removed
 
   MySecondKey ==  My second value
@@ -13,6 +12,11 @@ MyName==MyValue
 
 # This will also cause an error when uncommented because a key with this name already exists
 #  MySecondKey ==  Woops!
+
+
+FourthEntry==Number #4
+
+EntryFive==Number #5
 
 
 

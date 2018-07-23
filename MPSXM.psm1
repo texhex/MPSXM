@@ -838,7 +838,7 @@ Function Read-StringHashtable()
     write-verbose "Reading hashtable from $file"
 
     $result = $null
-    if ( $AsOrderedDictionary -eq $false )
+    if ( -not $AsOrderedDictionary )
     {
         $result = @{}
     }
@@ -878,12 +878,22 @@ Function Read-StringHashtable()
                 else
                 {
                     $name = $setting[0].Trim()
-                    $value = $setting[1].Trim()
+                    $value = $setting[1].Trim()                    
+                    $nameAlreadyExists = $false
             
                     #I'm unsure if this information is of any use
                     #write-verbose "Key-Value pair found: [$name] : [$value]"
 
-                    if ( $result.ContainsKey($name) )
+                    if ( -not $AsOrderedDictionary )
+                    {
+                        $nameAlreadyExists=$result.ContainsKey($name)
+                    }
+                    else
+                    {
+                        $nameAlreadyExists=$result.Contains($name)
+                    }
+                
+                    if ( $nameAlreadyExists )
                     {
                         throw New-Exception -InvalidOperation "Can not add key [$name] (Value: $value) because a key of this name already exists"
                     }
