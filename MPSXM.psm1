@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.28.1
+# Version 3.28.2
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -814,25 +814,39 @@ Function Read-StringHashtable()
  Key2==Value2
  ...
 #>
-{
-    
+{    
     #.SYNOPSIS
     #Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
     #
     #.PARAMETER File
     #The file to read the hashtable from
     #
+    #.PARAMETER AsOrderedDictionary
+    #If the order of the setting matter, use this parameter to return an OrderedDictionary where the order of the keys is exactly as they are in the file
+    #
     #.OUTPUTS
     #Hashtable
 
-    [OutputType([Hashtable])]  
     param(
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
-        [string]$File
+        [string]$File,
+
+        [Parameter(Mandatory = $False)]
+        [switch]$AsOrderedDictionary = $False
     )
 
-    $result = @{}
     write-verbose "Reading hashtable from $file"
+
+    $result = $null
+    if ( $AsOrderedDictionary -eq $false )
+    {
+        $result = @{}
+    }
+    else
+    {
+        $result = [Ordered]@{}
+    }
+        
 
     if ( Test-Path $file )
     {     
