@@ -13,7 +13,7 @@
 #
 #
 # Before adding a new function, please see
-# [Approved Verbs for Windows PowerShell Commands] http://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
+# [Approved Verbs for Windows PowerShell Commands] https://docs.microsoft.com/en-us/powershell/developer/cmdlet/approved-verbs-for-windows-powershell-commands
 #
 # To run a PowerShell script from the command line, use
 # powershell.exe [-NonInteractive] -ExecutionPolicy Bypass -File "C:\Script\DoIt.ps1"
