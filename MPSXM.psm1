@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.28.3
+# Version 3.28.4
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -1338,7 +1338,7 @@ Function Get-QuickReference()
             foreach ($qr in $qrList)
             {  
                 $txt += "`n" #start with a new line
-                $txt += "### $($qr.Name) ###`n"
+                $txt += "### $($qr.Name)`n"
                 $txt += "`n"
                 $txt += "$($qr.Synopsis)`n"
    
