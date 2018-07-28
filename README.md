@@ -1,24 +1,25 @@
 # Michael's PowerShell eXtension Module (MPSXM)
 A PowerShell module (v4+) with assorted functions. I added a function to this module as soon as I realized I will need it in more than one script. I release it under the Apache 2 License with the hope that other might find it useful too. 
 
-## How to use ##
+## How to use
 
 Just download it from [Releases](https://github.com/texhex/MPSXM/releases/latest) and put it in your ```PSModulePath``` path (see [MSDN](https://msdn.microsoft.com/en-us/library/dd878350(v=vs.85).aspx)). 
 
 You can also put it in the same directory where your script is and add it with ```Import-Module "$PSScriptRoot\MPSXM.psm1"```. 
 
-## Examples ##
+## Examples
 
 Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 
 ## Included Functions
+
 <!---------------------------------- START HERE ---------------------------------->
 <!---------------------------------- START HERE ---------------------------------->
 <!---------------------------------- START HERE ---------------------------------->
 
 
 
-### Add-RegistryValue ###
+### Add-RegistryValue
 
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
 
@@ -32,7 +33,7 @@ Add-RegistryValue [-Path] <String> [-Name] <String> [-Value] <String> -REG_SZ
 - *REG_SZ* - The data will be written as REG_SZ
 
 
-### ConvertFrom-DateTimeString ###
+### ConvertFrom-DateTimeString
 
 Converts a string (created by ConvertTo-DateTimeString() to a DateTime. If the given string contains a time zone (...+/-01:00),
 the DateTime is converted to local time. If the given string is in UTC (...Z), no conversion will take place.
@@ -44,7 +45,7 @@ ConvertFrom-DateTimeString [-DateTimeString] <String>
 - *DateTimeString* - The string to be converted to a DateTime
 
 
-### ConvertFrom-JsonToHashtable ###
+### ConvertFrom-JsonToHashtable
 
 Converts a string or contents of a file from JSON format to a hash table
 
@@ -57,7 +58,7 @@ ConvertFrom-JsonToHashtable -File <String>
 - *File* - A file path to a file that stores JSON data and that will be returned as hash table
 
 
-### ConvertFrom-UTC ###
+### ConvertFrom-UTC
 
 Converts a given Coordinated Universal Time (UTC) DateTime to local time.
 
@@ -68,7 +69,7 @@ ConvertFrom-UTC [-DateTime] <DateTime>
 - *DateTime* - The DateTime to be converted to local time from UTC. Inputs not in UTC will result in an exception.
 
 
-### ConvertTo-Array ###
+### ConvertTo-Array
 
 Convert a single value or a list of objects to an array; this way (Array).Count or a ForEach() loop always works. An input of $null will result in an array with length 0.
 
@@ -79,7 +80,7 @@ ConvertTo-Array [[-InputObject] <Object>]
 - *InputObject* - A single object, a list of objects or $null
 
 
-### ConvertTo-DateTimeString ###
+### ConvertTo-DateTimeString
 
 Converts a DateTime to a string as definied by ISO 8601. The result will be in the format [2016-11-24 14:59:16.718+01:00] for local and [2016-11-19 14:24:09.718Z] for UTC values.
 
@@ -95,7 +96,7 @@ ConvertTo-DateTimeString [-DateTime] <DateTime> [-HideMilliseconds] -ForceUTC
 - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and use it as if it were UTC already.
 
 
-### ConvertTo-HumanizedBytesString ###
+### ConvertTo-HumanizedBytesString
 
 Returns a string optimized for readability.
 
@@ -106,7 +107,7 @@ ConvertTo-HumanizedBytesString [-bytes] <Int64>
 - *bytes* - The value of bytes that should be returned as humanized string.
 
 
-### ConvertTo-UTC ###
+### ConvertTo-UTC
 
 Converts a given DateTime to a Coordinated Universal Time (UTC) DateTime.
 
@@ -118,7 +119,7 @@ ConvertTo-UTC [-DateTime] <DateTime> [-ForceUTC]
 - *ForceUTC* - Ignore the time zone/kind (Local, Unspecified, UTC) of the given DateTime and return the same date and time as the input as UTC
 
 
-### ConvertTo-Version ###
+### ConvertTo-Version
 
 Returns a VERSION object with the version number converted from the given text.
 
@@ -130,7 +131,7 @@ ConvertTo-Version [[-Text] <String>] [-RespectLeadingZeros]
 - *RespectLeadingZeros* - Respect leading zeros by shifting the parts right, e.g. 1.02.3 becomes 1.0.2.3.
 
 
-### Copy-FileToDirectory ###
+### Copy-FileToDirectory
 
 Copies a file to a directory, overwritting any existing copy
 
@@ -142,7 +143,7 @@ Copy-FileToDirectory [-Filename] <String> [-Directory] <String>
 - *Directory* - Path to the destination directory, e.g. C:\Windows\Temp
 
 
-### Exit-Context ###
+### Exit-Context
 
 Will exit from the current context and sets an exit code. Nothing will be done when running in ISE.
 
@@ -154,7 +155,7 @@ Exit-Context [-ExitCode] <Int32> [-Force]
 - *Force* - Will enfore full exit by using ENVIRONMENT.Exit()
 
 
-### Get-ComputerLastBootupTime ###
+### Get-ComputerLastBootupTime
 
 Returns the date and time of the last bootup time of this computer.
 
@@ -164,7 +165,7 @@ Get-ComputerLastBootupTime
 
 
 
-### Get-ContainingDirectory ###
+### Get-ContainingDirectory
 
 Returns the directory containing the item defined in the path string
 
@@ -175,7 +176,7 @@ Get-ContainingDirectory [-Path] <String>
 - *Path* - The string path e.g. C:\Path\MyFile.txt
 
 
-### Get-CurrentProcessBitness ###
+### Get-CurrentProcessBitness
 
 Returns information about the current powershell process.
 
@@ -190,7 +191,7 @@ Get-CurrentProcessBitness -Is64bit
 - *Is64bit* - Returns $True if the current script is running as 64-bit process.
 
 
-### Get-FileName ###
+### Get-FileName
 
 Returns the filename (with or without the extension) from a path string
 
@@ -202,7 +203,7 @@ Get-FileName [-Path] <String> [-WithoutExtension]
 - *WithoutExtension* - Return the filename without extension (MyFile.txt would be returned as MyFile)
 
 
-### Get-ModuleAvailable ###
+### Get-ModuleAvailable
 
 Returns true if the module exist; it uses a a method that is about 10 times faster then using Get-Module -ListAvailable
 
@@ -213,7 +214,7 @@ Get-ModuleAvailable [-Name] <String>
 - *Name* - The name of the module to be checked
 
 
-### Get-OperatingSystemBitness ###
+### Get-OperatingSystemBitness
 
 Returns information about the current operating system
 
@@ -226,7 +227,7 @@ Get-OperatingSystemBitness -Is64bit
 - *Is64bit* - Returns $True if the current operating system is 64-bit
 
 
-### Get-PropertyValueSafe ###
+### Get-PropertyValueSafe
 
 Tries to get a property value from the object and returns the replacement value if the property was not found or is null
 
@@ -239,7 +240,7 @@ Get-PropertyValueSafe [[-InputObject] <Object>] [[-Property] <Object>] [[-Defaul
 - *Default* - The value that should be used in case the property does not exist or is null
 
 
-### Get-QuickReference ###
+### Get-QuickReference
 
 Returns a quick reference about the given function or all functions in the module. The text returned includes function name, call syntax and parameters extracted from the function itself. 
 If you are on GitHub: the entire reference page was generated with it.
@@ -254,7 +255,7 @@ Get-QuickReference [-Name] <String> [-Output <String>] [-Module] [-SortByNoun]
 - *SortByNoun* - If a module is given, the functions are sorted by verb (e.g. all Get-xxx together, all Set-xxx together). This can be changed to be sorted by Noun, the second part of a function.
 
 
-### Get-RandomString ###
+### Get-RandomString
 
 Returns a random string (only Aa-Zz and 0-9 are used).
 
@@ -265,7 +266,7 @@ Get-RandomString [-Length] <Int32>
 - *Length* - The length of the string that should be generated.
 
 
-### Get-RegistryValue ###
+### Get-RegistryValue
 
 Reads a registry value.
 
@@ -278,7 +279,7 @@ Get-RegistryValue [-Path] <String> [-Name <String>] [-DefaultValue <Object>]
 - *DefaultValue* - The value to return if name does not exist. If not defined, $null is returned if Name does not exist
 
 
-### Get-RunningInISE ###
+### Get-RunningInISE
 
 Returns if the current script is executed by Windows PowerShell ISE (uses Test-IsISE internally)
 
@@ -288,7 +289,7 @@ Get-RunningInISE
 
 
 
-### Get-StringHasData ###
+### Get-StringHasData
 
 Returns true if the string contains data (does not contain $null, empty or only white spaces). Uses [Test-String -HasData] internally.
 
@@ -299,7 +300,7 @@ Get-StringHasData [-string] <String>
 - *string* - The string value to be checked
 
 
-### Get-StringHash ###
+### Get-StringHash
 
 Returns the hash value of the given string using the given algorithm
 
@@ -311,7 +312,7 @@ Get-StringHash [[-String] <String>] [-HashName] <String>
 - *HashName* - The hash algorithm to be used. Defaults to SHA1
 
 
-### Get-StringIsNullOrWhiteSpace ###
+### Get-StringIsNullOrWhiteSpace
 
 Returns true if the string is either $null, empty, or consists only of white-space characters (uses [Test-String -IsNullOrWhiteSpace] internally)
 
@@ -322,7 +323,7 @@ Get-StringIsNullOrWhiteSpace [-string] <String>
 - *string* - The string value to be checked
 
 
-### Get-TempFolder ###
+### Get-TempFolder
 
 Returns a path to the temporary folder without any (8+3) paths in it. The path does not include a "\" at the end.
 
@@ -332,7 +333,7 @@ Get-TempFolder
 
 
 
-### Get-TrimmedString ###
+### Get-TrimmedString
 
 Removes white-space characters from the given string. By default, it removes all leading and trailing white-spaces chracters.
 
@@ -354,7 +355,7 @@ placed.
 - *RemoveAll* - Removes all white-space chracters from the string
 
 
-### New-Dictionary ###
+### New-Dictionary
 
 Returns a dictionary that can be used like a hashtable (Key-Value pairs) but the pairs are not sorted by the key as in a hashtable
 
@@ -370,7 +371,7 @@ New-Dictionary -KeyType <String> -ValueType <String>
 - *ValueType* - Defines the type used for the value.
 
 
-### New-Exception ###
+### New-Exception
 
 Generates an exception ready to be thrown, the expected usage is [throw New-Exception -(TypeOfException) "Explanation why exception is thrown"]
 
@@ -391,18 +392,19 @@ New-Exception -DirectoryNotFound [[-Explanation] <String>] [-NoCallerName]
 - *NoCallerName* - By default, the name of the function or script generating the exception is included in the explanation
 
 
-### Read-StringHashtable ###
+### Read-StringHashtable
 
 Reads a hashtable from a file where the Key-Value pairs are stored as Key==Value
 
 ```powershell
-Read-StringHashtable [-File] <String>
+Read-StringHashtable [-File] <String> [-AsOrderedDictionary]
 ```
 
 - *File* - The file to read the hashtable from
+- *AsOrderedDictionary* - If the order of the setting matter, use this parameter to return an OrderedDictionary. The order of the keys is exactly as they are in the file.
 
 
-### Remove-FileExact ###
+### Remove-FileExact
 
 Deletes a file; no wildcards are accepted, the filename must be exact. Exact also means that an 8+3 alias is not allowed (Filena~1). If the file does not exist, no error is generated.
 
@@ -413,7 +415,7 @@ Remove-FileExact [[-Filename] <String>]
 - *Filename* - The full path to the file that should be deleted.
 
 
-### Select-StringUnicodeCategory ###
+### Select-StringUnicodeCategory
 
 Selects (filters) characters based on their unicode category from the given string. [Select-StringUnicodeCategory "A B C 123" -IncludeLetter] would return "ABC"
 
@@ -429,7 +431,7 @@ Select-StringUnicodeCategory [[-String] <String>] [-IncludeLetter] [-IncludeNumb
 - *IncludeSymbol* - Include symbol characters
 
 
-### Set-HTTPSecurityProtocolSecureDefault ###
+### Set-HTTPSecurityProtocolSecureDefault
 
 Sets the default HTTPS protocol to TLS 1.2 (and any newer protocol) while disabling unsecure protocols (SSL 3.0, TLS 1.0 and TLS 1.1) in a forward-compatible style
 
@@ -439,7 +441,7 @@ Set-HTTPSecurityProtocolSecureDefault
 
 
 
-### Set-RegistryValue ###
+### Set-RegistryValue
 
 Writes a registry value in the given registry path.
 
@@ -453,7 +455,7 @@ Set-RegistryValue [-Path] <String> [-Name <String>] -Value <Object> [-Type {Unkn
 - *Type* - The data type used in the registry (REG_xx). If not specified, the type of the given value will be used to assign DWord, QWord or String.
 
 
-### Show-MessageBox ###
+### Show-MessageBox
 
 Shows the message to the user using a message box.
 
@@ -467,7 +469,7 @@ Show-MessageBox [-Message] <String> [[-Titel] <String>] [-Critical] [-Huge]
 - *Huge* - Adds extra lines to the message to ensure the message box appears bigger.
 
 
-### Start-TranscriptIfSupported ###
+### Start-TranscriptIfSupported
 
 Starts a transscript, but ignores if the host does not support it.
 
@@ -480,7 +482,7 @@ Start-TranscriptIfSupported [[-Path] <String>] [[-Name] <String>] [-NewLog]
 - *NewLog* - Create a new log file every time a transcript is started ([Name].log-XX.txt)
 
 
-### Start-TranscriptTaskSequence ###
+### Start-TranscriptTaskSequence
 
 If the scripts runs in MDT or SCCM, the transcript will be stored in the path LOGPATH defines. If not, C:\WINDOWS\TEMP is used.
 
@@ -491,7 +493,7 @@ Start-TranscriptTaskSequence [-NewLog]
 - *NewLog* - When set, will create a log file every time a transcript is started
 
 
-### Stop-TranscriptIfSupported ###
+### Stop-TranscriptIfSupported
 
 Stops a transscript, but ignores if the host does not support it.
 
@@ -501,7 +503,7 @@ Stop-TranscriptIfSupported
 
 
 
-### Test-Admin ###
+### Test-Admin
 
 Determines if the current powershell is elevated (running with administrator privileges).
 
@@ -511,7 +513,7 @@ Test-Admin
 
 
 
-### Test-DirectoryExists ###
+### Test-DirectoryExists
 
 Returns if a the given directory exists
 
@@ -522,7 +524,7 @@ Test-DirectoryExists [-Path] <String>
 - *Path* - The string path of a directory, e.g. C:\Windows
 
 
-### Test-FileExists ###
+### Test-FileExists
 
 Returns if a the given file exists
 
@@ -533,7 +535,7 @@ Test-FileExists [-Path] <String>
 - *Path* - The string path of the fiel , e.g. C:\Temp\MyFile.txt"
 
 
-### Test-IsHashtable ###
+### Test-IsHashtable
 
 Returns if the parameter is a hash table or an ordered dictionary (which behave the same as hash tables )
 
@@ -544,7 +546,7 @@ Test-IsHashtable [-InputObject] <Object>
 - *InputObject* - An object that is checked if it's a hash table
 
 
-### Test-IsISE ###
+### Test-IsISE
 
 Returns if the current script is executed by Windows PowerShell ISE
 
@@ -554,7 +556,7 @@ Test-IsISE
 
 
 
-### Test-RunningInEditor ###
+### Test-RunningInEditor
 
 Returns TRUE if the current script is executed by a editor (host) like ISE or Visual Studio Code
 
@@ -564,7 +566,7 @@ Test-RunningInEditor
 
 
 
-### Test-String ###
+### Test-String
 
 Tests the given string for a condition
 
@@ -578,12 +580,10 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
 - *String* - The string the specified operation should be performed on
 - *HasData* - Returns true if the string contains data (not $null, empty or only white spaces)
 - *IsNullOrWhiteSpace* - Returns true if the string is either $null, empty, or consists only of white-space characters.
-- *Contains* - Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
-- *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default.
+- *Contains* - Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
+- *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
 - *SearchFor* - The string beeing sought
-- *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC].
- 
- 
+- *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC
  
 <!---------------------------------- STOP HERE ---------------------------------->
 <!---------------------------------- STOP HERE ---------------------------------->
