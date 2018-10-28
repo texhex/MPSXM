@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.29.1
+# Version 3.29.2
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -779,7 +779,7 @@ Function Start-TranscriptIfSupported()
 
     try 
     {
-        write-verbose "Start-TranscriptIfSupported: Trying to execute Start-Transcript for $logFile"
+        write-verbose "Start-TranscriptIfSupported: Log will be written to [$logFile]"
         Start-Transcript -Path $logfile
     }
     catch [System.Management.Automation.PSNotSupportedException]
