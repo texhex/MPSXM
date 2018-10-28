@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.28.5
+# Version 3.29.0
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -253,9 +253,28 @@ Function Get-StringHasData()
 
 Function Test-String()
 <#
+A word of warning: Whatever we are doing here, it's flawed. As we are processing strings here, 
+we should take the local character handling rules into account.
+
+However, this can lead to the situation where this function becomes non-deterministic as the same 
+output leads to different results, as it depends on current rules (in .NET terms: Current Culture). 
+Which means, the function might have a bug on a system (because of the current rules applied 
+“in the background” because of the culture) and when somebody else tries to reproduce this, the bug 
+disappears because that system is using different rules (as it uses a different culture).
+
+We will therefore use CultureInfo.InvariantCulture which should allow the function to be deterministic
+as the current rules are ignored. 
+ 
+This might lead to other bugs as a user expects the function to respect local rule “A”, but at least 
+the bug will be reproducible. 
+
+Please also see:
+https://stackoverflow.com/a/9760339
+https://www.jetbrains.com/help/resharper/2018.2/SpecifyACultureInStringConversionExplicitly.html
+-----------------------------------
+
  -IsNullOrWhiteSpace:
    Helper function for [string]::IsNullOrWhiteSpace - http://msdn.microsoft.com/en-us/library/system.string.isnullorwhitespace%28v=vs.110%29.aspx
- 
 
    Test-String "a" -IsNullorWhitespace #false
    Test-String $null -IsNullorWhitespace #$true
@@ -267,10 +286,13 @@ Function Test-String()
    String is not IsNullOrWhiteSpace
 
  -Contains
-   Standard Contains() or IndexOf
+   Standard IndexOf
 
  -StartsWith
    Uses string.StartsWith() with different parameters
+
+ -EndsWith
+   Uses string.EndsWith() with different parameters
 #> 
 {   
     #.SYNOPSIS
@@ -286,10 +308,13 @@ Function Test-String()
     #Returns true if the string contains data (not $null, empty or only white spaces)
     #
     #.PARAMETER Contains
-    #Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
+    #Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.
     #
     #.PARAMETER StartsWith
-    #Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
+    #Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.
+    #
+    #.PARAMETER EndsWith
+    #Returns true if the string ends with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.
     #
     #.PARAMETER SearchFor
     #The string beeing sought
@@ -300,12 +325,13 @@ Function Test-String()
     #.OUTPUTS
     #bool
 
+
     [OutputType([bool])]  
     param (
         #Be aware that PowerShell will move the  first string it finds to this parameter,
         #as this parameter is not mandatory. E.g. when calling this function as 
         #Test-String -Contains "X", "X" will in $string, not in $searchFor!
-        #But we require the not mandatory parameter or else  we can not pass empty strings here.
+        #But we require the not mandatory parameter or else we can not pass empty strings here.
         [Parameter(Mandatory = $false, Position = 1)] 
         [string]$String = $null,
 
@@ -321,12 +347,17 @@ Function Test-String()
         [Parameter(ParameterSetName = "StartsWith", Mandatory = $true)]
         [switch]$StartsWith,
 
+        [Parameter(ParameterSetName = "EndsWith", Mandatory = $true)]
+        [switch]$EndsWith,
+
         [Parameter(ParameterSetName = "Contains", Position = 2, Mandatory = $false)] #$False or we can not pass an empty string in
-        [Parameter(ParameterSetName = "StartsWith", Position = 2, Mandatory = $false)]         
+        [Parameter(ParameterSetName = "StartsWith", Position = 2, Mandatory = $false)]
+        [Parameter(ParameterSetName = "EndsWith", Position = 2, Mandatory = $false)]
         [string]$SearchFor,
 
-        [Parameter(ParameterSetName = "Contains", Mandatory = $false)] 
-        [Parameter(ParameterSetName = "StartsWith", Mandatory = $false)] #$False or we can not pass an empty string in
+        [Parameter(ParameterSetName = "Contains", Mandatory = $false)] #$False or we can not pass an empty string in
+        [Parameter(ParameterSetName = "StartsWith", Mandatory = $false)]
+        [Parameter(ParameterSetName = "EndsWith", Mandatory = $false)]
         [Switch]$CaseSensitive = $false
     )
 
@@ -365,7 +396,11 @@ Function Test-String()
             {
                 if ( $CaseSensitive ) 
                 {
-                    $result = $String.Contains($SearchFor)
+                    #<string>.Contains: This method performs an ordinal (case-sensitive and culture-insensitive) comparison.
+                    #$result = $String.Contains($SearchFor)
+
+                    #We are using IndexOf to make sure we are using the same method in any case
+                    $result = ( $String.IndexOf($SearchFor, [StringComparison]::Ordinal) ) -ge 0
                 }
                 else
                 {
@@ -377,7 +412,8 @@ Function Test-String()
                     #$index=$String.IndexOf($SearchFor, ([System.StringComparer]::OrdinalIgnoreCase))
                     #$index=$String.IndexOf($SearchFor, "System.StringComparison.OrdinalIgnoreCase")       
         
-                    #We could also use [StringComparison]::CurrentCultureIgnoreCase but it seems OrdinalIgnoreCase does the job also
+                    #According to https://docs.microsoft.com/de-de/dotnet/standard/base-types/best-practices-strings?view=netframework-4.7.2
+                    #Ordinal operations are the safest and fastes method available
                     $result = ( $String.IndexOf($SearchFor, [StringComparison]::OrdinalIgnoreCase) ) -ge 0
                 }
             }
@@ -398,11 +434,35 @@ Function Test-String()
             {
                 if ( $CaseSensitive ) 
                 {
-                    $result = $String.StartsWith($SearchFor)
+                    $result = $String.StartsWith($SearchFor, [StringComparison]::Ordinal)
                 }
                 else
                 {
                     $result = $String.StartsWith($SearchFor, [StringComparison]::OrdinalIgnoreCase)
+                }
+            }
+        }
+
+        "EndsWith"
+        {
+            
+            #If either $string or $searchFor is $null, the result is always $false
+            if (
+                ([string]::IsNullOrWhiteSpace($String)) -or
+                ([string]::IsNullOrWhiteSpace($SearchFor))
+            )
+            {
+                $result = $false
+            }
+            else
+            {
+                if ( $CaseSensitive ) 
+                {
+                    $result = $String.EndsWith($SearchFor, [StringComparison]::Ordinal)
+                }
+                else
+                {
+                    $result = $String.EndsWith($SearchFor, [StringComparison]::OrdinalIgnoreCase)
                 }
             }
         }
@@ -416,7 +476,6 @@ Function Test-String()
 
 #Yes, I'm aware of $env:TEMP but this will always return a 8+3 path, e.g. C:\USERS\ADMIN~1\AppData..."
 #This function returns the real path without that "~" garbage
-
 Function Get-TempFolder() 
 {   
     #.SYNOPSIS
