@@ -1,5 +1,5 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.29.0
+# Version 3.29.1
 # https://github.com/texhex/MPSXM
 #
 # Copyright © 2010-2018 Michael 'Tex' Hex 
@@ -609,19 +609,28 @@ Function Start-TranscriptTaskSequence()
     catch
     {
         $logPath = $env:windir + "\temp"
-        Write-Verbose "Start-TranscriptTaskSequence: This script is not running in a task sequence, will use [$logPath]"
+        Write-Verbose "Start-TranscriptTaskSequence: This script is not running in a task sequence, defaulting to [$logPath]"
     }
 
-    $logName = Split-Path -Path $myInvocation.ScriptName -Leaf   
-    Write-Verbose "Start-TranscriptTaskSequence: Using logfile $($logName)"
- 
-    if ( $NewLog ) 
+    #Use the calling script as the name of the logfile. In case ScriptName is not set, we are using PowerShell 3+ command path
+    if ( Test-String $myInvocation.ScriptName -HasData )
     {
-        Start-TranscriptIfSupported -Path $logPath -Name $logName -NewLog 
+        $logName = $myInvocation.ScriptName
     }
     else
     {
-        Start-TranscriptIfSupported -Path $logPath -Name $logName
+        $logName = $PSCommandPath
+    }
+    $logName = Split-Path -Path $logName -Leaf   
+    Write-Verbose "Start-TranscriptTaskSequence: Using log filename [$($logName)]"
+ 
+    if ( $NewLog ) 
+    {
+        Start-TranscriptIfSupported -Path $logPath -Name $logName -NewLog -Verbose:$VerbosePreference
+    }
+    else
+    {
+        Start-TranscriptIfSupported -Path $logPath -Name $logName -Verbose:$VerbosePreference
     }
 
 }
@@ -647,26 +656,50 @@ Function Start-TranscriptIfSupported()
 #>    
     param(
         [Parameter(Mandatory = $False, Position = 1)]
-        [string]$Path = $env:TEMP,
+        [AllowEmptyString()] #This allows to set this parameter in a call, altough the value is empty
+        [string]$Path,
 
         [Parameter(Mandatory = $False, Position = 2)]
+        [AllowEmptyString()] #This allows to set this parameter in a call, altough the value is empty
         [string]$Name,
   
         [Parameter(Mandatory = $False)]
         [switch]$NewLog = $False
     )
 
-    if ( Test-String -IsNullOrWhiteSpace $Name )
+    #Check if we got a working path. If not, default to TEMP
+    if ( Test-String -IsNullOrWhiteSpace $Path )
     {
-        $Name = Split-Path -Path $myInvocation.ScriptName -Leaf   
+        $Path = $env:TEMP
+        Write-Verbose "Start-TranscriptIfSupported: Path parameter was not specified or is empty, defaulting to [$Path]"
+    }
+    else
+    {            
+        #Check if the given folder exists and default to TEMP if not
+        if ( -not (Test-DirectoryExists $Path) )
+        {
+            write-error "Start-TranscriptIfSupported: Given path [$Path] does not exist, defaulting to [$($env:TEMP)]" -ErrorAction Continue
+            $Path = $env:TEMP
+        }
     }
 
-    if ( -not (Test-DirectoryExists $Path) )
+    #Check if a log file name was given. If not, use the current script name
+    if ( Test-String -IsNullOrWhiteSpace $Name )
     {
-        write-error "Logfile path [$Path] does not exist, defaulting to [$($env:TEMP)]" -ErrorAction Continue
-        $Path = $env:TEMP
+        #Use the calling script as the name of the logfile. In case ScriptName is not set, we are using PowerShell 3+ command path
+        if ( Test-String $myInvocation.ScriptName -HasData )
+        {
+            $Name = $myInvocation.ScriptName
+        }
+        else
+        {
+            $Name = $PSCommandPath
+        }
+        $Name = Split-Path -Path $Name -Leaf   
+
+        Write-Verbose "Start-TranscriptIfSupported: Name parameter was not specified or is empty, will use [$Name]"
     }
- 
+
     $logFileTemplate = "$($Name).log"
     $extension = "txt" #always use lower case chars only!
  
@@ -746,7 +779,7 @@ Function Start-TranscriptIfSupported()
 
     try 
     {
-        write-verbose "Trying to execute Start-Transcript for $logFile"
+        write-verbose "Start-TranscriptIfSupported: Trying to execute Start-Transcript for $logFile"
         Start-Transcript -Path $logfile
     }
     catch [System.Management.Automation.PSNotSupportedException]
