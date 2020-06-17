@@ -1,8 +1,8 @@
 ﻿# Michael's PowerShell eXtension Module
-# Version 3.29.3
+# Version 3.29.4
 # https://github.com/texhex/MPSXM
 #
-# Copyright © 2010-2018 Michael 'Tex' Hex 
+# Copyright © 2010-2020 Michael 'Tex' Hex 
 # Licensed under the Apache License, Version 2.0. 
 #
 # Import this module in case it is located in the same folder as your script:
@@ -544,7 +544,7 @@ Function Get-ModuleAvailable()
         #a lot faster since get-module will then return $TRUE.
 
         $mod = Import-Module $name -PassThru -ErrorAction SilentlyContinue -Scope Local
-        if ($mod -ne $null) 
+        if ($null -ne $mod) 
         {
             return $true
         } 
@@ -734,7 +734,7 @@ Function Start-TranscriptIfSupported()
         }
    
         #In case we get $null this means that no files were found. Nothing more to 
-        if ( $existing_files -ne $null )
+        if ( $null -ne $existing_files )
         {
             #at least one other file exists. Reorder so the log file with the highest name is at the end
             $existing_files = $existing_files | Sort-Object -Property "Name"
@@ -879,7 +879,7 @@ Function Show-MessageBox()
     }
 
     #display message box
-    $ignored = [System.Windows.Forms.MessageBox]::Show($message, $Titel, 0, $type)
+    [System.Windows.Forms.MessageBox]::Show($message, $Titel, 0, $type) | Out-Null
 }
 
 
@@ -967,7 +967,7 @@ Function Read-StringHashtable()
         $data = Get-Content $file -Raw
         $lines = $data -split "`n" #we split at LF, not CR+LF in case someone has used the wrong line ending AGAIN
 
-        if ( ($lines -eq $null) -or ($lines.Count -eq 0) )
+        if ( ($null -eq $lines) -or ($lines.Count -eq 0) )
         {
             #OK, this didn't worked. Maybe someone used pure CR?
             $lines = $data -split "`r"
@@ -1096,7 +1096,7 @@ Function ConvertTo-Version()
         $version = $null
     }
 
-    if ( $version -ne $null) 
+    if ( $null -ne $version) 
     {
         #when we are here, the version could be parsed 
         if ( $RespectLeadingZeros)
@@ -1216,7 +1216,8 @@ Function Exit-Context()
         if ( $Force )
         {
             #use the "nuclear way"...
-            $ignored = [Environment]::Exit($ExitCode)
+            #$ignored = [Environment]::Exit($ExitCode)
+            [Environment]::Exit($ExitCode) | Out-Null
         }
    
         #This is also possible...
@@ -1319,7 +1320,7 @@ Function Get-QuickReference()
         # Parameters
 
         #parameters might be null
-        if ( $help.parameters -ne $null  )
+        if ( $null -ne $help.parameters  )
         {
             #Temp object which will be used to either store a single paramter or just the real parameter collection
             $params = @()
@@ -1328,14 +1329,14 @@ Function Get-QuickReference()
             if ( $help.parameters -isnot [String] ) 
             {
                 #the parameter can also be null
-                if ( $help.parameters.parameter -ne $null )
+                if ( $null -ne $help.parameters.parameter )
                 {
                     #When we are here, we might have one or more parameters
                     #I have no idea how to better check this, as (( -is [array] )) is not working          
                     try
                     {
                         #this will fail if there is only one parameter
-                        $ignored = $help.parameters.parameter.Count             
+                        $params = $help.parameters.parameter.Count             
                         $params = $help.parameters.parameter
                     }
                     catch
@@ -2113,10 +2114,12 @@ Function Add-RegistryValue()
 
     if ( !(Test-Path $Path) ) 
     {
-        $ignored = New-Item -Path $Path -Force 
+        #$ignored = New-Item -Path $Path -Force 
+        New-Item -Path $Path -Force | Out-Null
     } 
 
-    $ignored = New-ItemProperty -Path $path -Name $name -Value $value -PropertyType String -Force 
+    #$ignored = New-ItemProperty -Path $path -Name $name -Value $value -PropertyType String -Force 
+    New-ItemProperty -Path $path -Name $name -Value $value -PropertyType String -Force | Out-Null
 }
 
 
@@ -2171,14 +2174,16 @@ Function Set-RegistryValue()
     #Create the path if it does not exist
     if ( -not (Test-Path $regPath -PathType Container) ) 
     {
-        $ignored = New-Item -Path $regPath -Force 
+        #$ignored = New-Item -Path $regPath -Force 
+        New-Item -Path $regPath -Force | Out-Null
     } 
 
     #check if value name was given. If not, write to (default)
     if ( Test-String -IsNullOrWhiteSpace $Name )
     {
         #default values only support string, so we always convert to string
-        $ignored = Set-Item -Path $regPath -Value $value.ToString()
+        #$ignored = Set-Item -Path $regPath -Value $value.ToString()
+        Set-Item -Path $regPath -Value $value.ToString() | Out-Null
     }
     else
     {
@@ -2200,7 +2205,8 @@ Function Set-RegistryValue()
             }
         }
    
-        $ignored = New-ItemProperty -Path $regPath -Name $name -Value $value -PropertyType $Type -Force 
+        #$ignored = New-ItemProperty -Path $regPath -Name $name -Value $value -PropertyType $Type -Force 
+        New-ItemProperty -Path $regPath -Name $name -Value $value -PropertyType $Type -Force | Out-Null
     }
 }
 
@@ -2429,7 +2435,8 @@ Function Copy-FileToDirectory()
         throw New-Exception -DirectoryNotFound "The destination directory [$dest] does not exist"
     }
 
-    $ignored = Copy-Item -Path $Filename -Destination $dest -Force
+    #$ignored = Copy-Item -Path $Filename -Destination $dest -Force
+    Copy-Item -Path $Filename -Destination $dest -Force | Out-Null
 }
 
 
@@ -2448,7 +2455,7 @@ Function ConvertTo-Array()
     )
 
     #if it's null, return an empty array
-    if ( $InputObject -eq $null )  
+    if ( $null -eq $InputObject )  
     {      
         $empty = @()
         
@@ -2459,7 +2466,7 @@ Function ConvertTo-Array()
     else
     {
         #get the number of objects in the list      
-        $count = ($InputObject| Measure-Object).Count
+        $count = ($InputObject | Measure-Object).Count
         $array = @()
         
         if ( $count -le 0 )
@@ -2633,7 +2640,7 @@ Function Get-StringHash()
 
     $StringBuilder = New-Object System.Text.StringBuilder
     
-    [System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String))| ForEach-Object {
+    [System.Security.Cryptography.HashAlgorithm]::Create($HashName).ComputeHash([System.Text.Encoding]::UTF8.GetBytes($String)) | ForEach-Object {
         [void]$StringBuilder.Append($_.ToString("x2"))
     }
 
@@ -2661,7 +2668,7 @@ Function Test-IsHashtable()
     ) 
   
     
-    if ( $InputObject -eq $null )
+    if ( $null -eq $InputObject )
     {
         return $false    
     }
@@ -2817,7 +2824,7 @@ Function Test-IsISE()
     
     try 
     {    
-        return $psISE -ne $null
+        return $null -ne $psISE
     }
     catch 
     {
@@ -2840,11 +2847,11 @@ Function Test-RunningInEditor()
 
     try 
     {   
-        $host = Get-Host
+        $hostingIn = Get-Host
 
         if ( 
-            ($host.Name -eq "Windows PowerShell ISE Host") -or
-            ($host.Name -eq "Visual Studio Code Host") 
+            ($hostingIn.Name -eq "Windows PowerShell ISE Host") -or
+            ($hostingIn.Name -eq "Visual Studio Code Host") 
         )
         {
 
@@ -2895,7 +2902,7 @@ Function Get-PropertyValueSafe()
     )
 
     #If either inputobject or the proerty are null, we can't do anything
-    if ( ($InputObject -eq $null) -or ($Property -eq $null) )
+    if ( ($null -eq $InputObject) -or ($null -eq $Property) )
     {
         return $Default
     }
@@ -2910,7 +2917,7 @@ Function Get-PropertyValueSafe()
                 {
                     $value = $InputObject[$Property]    
                 
-                    if ($value -ne $null)
+                    if ($null -ne $value)
                     {
                         return $value
                     }
@@ -2938,7 +2945,7 @@ Function Get-PropertyValueSafe()
                 {
                     $value = Select-Object -InputObject $InputObject -ExpandProperty $Property
 
-                    if ($value -ne $null)
+                    if ($null -ne $value)
                     {
                         return $value
                     }

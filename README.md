@@ -590,7 +590,9 @@ Test-String [[-String] <String>] -EndsWith [[-SearchFor] <String>] [-CaseSensiti
 <!---------------------------------- STOP HERE ---------------------------------->
 
 ## Contributions
+
 Any constructive contribution is very welcome! If you encounter a bug or have an addition, please create a [new issue](https://github.com/texhex/MPSXM/issues/new).
 
 ## License
+
 Copyright © 2010-2020 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.
