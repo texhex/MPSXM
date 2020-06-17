@@ -18,7 +18,6 @@ Examples for each function are included in ``MPSXM-QuickTests.ps1``.
 <!---------------------------------- START HERE ---------------------------------->
 
 
-
 ### Add-RegistryValue
 
 Adds a value to the given registry path. Uses [Set-RegistryValue] internally.
@@ -242,7 +241,7 @@ Get-PropertyValueSafe [[-InputObject] <Object>] [[-Property] <Object>] [[-Defaul
 
 ### Get-QuickReference
 
-Returns a quick reference about the given function or all functions in the module. The text returned includes function name, call syntax and parameters extracted from the function itself. 
+Returns a quick reference about the given function or all functions in the module. The text returned includes function name, call syntax and parameters extracted from the function itself.
 If you are on GitHub: the entire reference page was generated with it.
 
 ```powershell
@@ -350,8 +349,7 @@ Get-TrimmedString [[-String] <String>] -RemoveAll
 - *StartOnly* - Only remove leading white-space chracters
 - *EndOnly* - Only remove trailing white-space chracters
 - *Equalize* - Removes all leading and trailing white-space characters, then replace any character considered to be a white-space with the standard white-space character (U+0020)
-- *RemoveDuplicates* - Removes all leading and trailing white-space characters, then replace any white-space duplicates with one white-space (U+0020); any non-standard white-space characters will also be re
-placed.
+- *RemoveDuplicates* - Removes all leading and trailing white-space characters, then replace any white-space duplicates with one white-space (U+0020); any non-standard white-space characters will also be replaced.
 - *RemoveAll* - Removes all white-space chracters from the string
 
 
@@ -575,16 +573,18 @@ Test-String [[-String] <String>] -HasData
 Test-String [[-String] <String>] -IsNullOrWhiteSpace
 Test-String [[-String] <String>] -Contains [[-SearchFor] <String>] [-CaseSensitive]
 Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensitive]
+Test-String [[-String] <String>] -EndsWith [[-SearchFor] <String>] [-CaseSensitive]
 ```
 
 - *String* - The string the specified operation should be performed on
 - *HasData* - Returns true if the string contains data (not $null, empty or only white spaces)
 - *IsNullOrWhiteSpace* - Returns true if the string is either $null, empty, or consists only of white-space characters.
-- *Contains* - Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
-- *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If any of the strings do not contain data, $false is returned.
+- *Contains* - Returns true if string contains the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.
+- *StartsWith* - Returns true if the string starts with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.   
+- *EndsWith* - Returns true if the string ends with the text in SearchFor. A case-insensitive (ABCD = abcd) is performed by default. If this parameter or SearchFor does not contain data, $false is returned.       
 - *SearchFor* - The string beeing sought
-- *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC
- 
+- *CaseSensitive* - Perform an operation that respect letter casing, so [ABC] is different from [aBC]. 
+
 <!---------------------------------- STOP HERE ---------------------------------->
 <!---------------------------------- STOP HERE ---------------------------------->
 <!---------------------------------- STOP HERE ---------------------------------->
@@ -593,4 +593,4 @@ Test-String [[-String] <String>] -StartsWith [[-SearchFor] <String>] [-CaseSensi
 Any constructive contribution is very welcome! If you encounter a bug or have an addition, please create a [new issue](https://github.com/texhex/MPSXM/issues/new).
 
 ## License
-Copyright © 2010-2018 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.
+Copyright © 2010-2020 [Michael Hex](http://www.texhex.info/). Licensed under the **Apache 2 License**. For details, please see LICENSE.txt.
